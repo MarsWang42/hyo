@@ -1,65 +1,4 @@
 $breakpoint-alpha: 480px;
-
-.rwd-table {
-  margin: 1em 0;
-  min-width: 300px;
-  
-  tr {
-    border-top: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  th {
-    display: none;
-  }
-  
-  td {
-    display: block; 
-    
-    &:first-child {
-      padding-top: .5em;
-    }
-    &:last-child {
-      padding-bottom: .5em;
-    }
-
-    &:before {
-      content: attr(data-th)": ";
-      font-weight: bold;
-
-      width: 6.5em;
-      display: inline-block;
-      
-      @media (min-width: $breakpoint-alpha) {
-        display: none;
-      }
-    }
-  }
-  
-  th, td {
-    text-align: left;
-    
-    @media (min-width: $breakpoint-alpha) {
-      display: table-cell;
-      padding: .25em .5em;
-      
-      &:first-child {
-        padding-left: 0;
-      }
-      
-      &:last-child {
-        padding-right: 0;
-      }
-    }
-
-  }
-  
-  
-}
-
-
-
-
 @import url('http://fonts.googleapis.com/css?family=Montserrat:300,400,700');
 
 body {
@@ -71,27 +10,43 @@ body {
   background: #eee;
 }
 
-h1 {
-  font-weight: normal;
-  letter-spacing: -1px;
-  color: #34495E;
-}
-
 .rwd-table {
+  margin: 1em 0;
+  min-width: 300px;
   background: #34495E;
   color: #fff;
   border-radius: .4em;
   overflow: hidden;
-  tr {
-    border-color: lighten(#34495E, 10%);
-  }
-  th, td {
-    margin: .5em 1em;
-    @media (min-width: $breakpoint-alpha) { 
-      padding: 1em !important; 
+  
+  th {
+    color: #dd5;
+    &.sortable {
+      cursor: pointer;
+    }
+    .sort {
+      float: right;
+      margin-top: 8px;
+    }
+    .sortup {
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 5px solid black;
+      text-align: right;
+    }
+    .sortdown {
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 5px solid black;
+      text-align: right;
     }
   }
-  th, td:before {
-    color: #dd5;
+  
+  th, td {
+    text-align: left;
+    padding: 1em; 
   }
 }
