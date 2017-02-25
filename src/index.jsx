@@ -53,6 +53,17 @@ export default class Table extends Component {
       });
     };
 
+    const filterComponent = () => {
+      return (
+        <div>
+          <label htmlFor="filterCol">Filter:</label>
+          <input type="text" id="filterCol" />
+          <label htmlFor="filterKeyword">Keyword:</label>
+          <input type="text" id="filterKeyword" />
+        </div>
+      );
+    };
+
     // Generate headers according to definition
     const generateHeaders = () => {
       const headers = def.map((col) => {
