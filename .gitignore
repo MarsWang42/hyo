@@ -8,7 +8,12 @@ yarn-error.log*
 # Dependency directories
 node_modules/
 
-#Swp files
+# Swp files
 *.swp
 *.swo
 
+# BuiltJS
+build/
+
+# Ignore Files
+.eslintignore

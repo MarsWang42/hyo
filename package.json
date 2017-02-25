@@ -8,7 +8,8 @@
   "license": "MIT",
   "scripts": {
     "storybook": "start-storybook -p 9001 -c .storybook",
-    "webpack": "./node_modules/.bin/webpack -d"
+    "dev": "WEBPACK_ENV=build ./node_modules/.bin/webpack -d",
+    "build": "WEBPACK_ENV=build ./node_modules/.bin/webpack --progress --colors"
   },
   "dependencies": {
     "@kadira/storybook": "^2.35.3",
