@@ -1,52 +1,53 @@
 $breakpoint-alpha: 480px;
 @import url('http://fonts.googleapis.com/css?family=Montserrat:300,400,700');
 
-body {
-  padding: 0 2em;
+.rwd-table {
   font-family: Montserrat, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  color: #444;
-  background: #eee;
-}
-
-.rwd-table {
   margin: 1em 0;
   min-width: 300px;
-  background: #34495E;
-  color: #fff;
-  border-radius: .4em;
-  overflow: hidden;
-  
-  th {
-    color: #dd5;
-    &.sortable {
-      cursor: pointer;
+
+  table {
+    border-radius: .4em;
+    border: 1px solid black;
+    border-collapse: collapse;
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2
     }
-    .sort {
-      float: right;
-      margin-top: 8px;
+
+    th, td {
+      padding: 15px;
+      text-align: left;
+      border: 1px solid #cccccc;
     }
-    .sortup {
-      width: 0;
-      height: 0;
-      border-left: 5px solid transparent;
-      border-right: 5px solid transparent;
-      border-bottom: 5px solid black;
-      text-align: right;
+    
+    th {
+      background-color: #f2f2f2;
+      &.sortable {
+        cursor: pointer;
+      }
+      .sort {
+        float: right;
+        margin-top: 8px;
+      }
+      .sortup {
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-bottom: 5px solid black;
+        text-align: right;
+      }
+      .sortdown {
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid black;
+        text-align: right;
+      }
     }
-    .sortdown {
-      width: 0;
-      height: 0;
-      border-left: 5px solid transparent;
-      border-right: 5px solid transparent;
-      border-top: 5px solid black;
-      text-align: right;
-    }
-  }
-  
-  th, td {
-    text-align: left;
-    padding: 1em; 
   }
 }

@@ -9,6 +9,8 @@ export default class Table extends Component {
       sortingCol: "",
       sortingDirection: "asc",
       sortedRows: [],
+      filterCol: "",
+      filterKeyword: "",
     };
   }
 
@@ -17,8 +19,17 @@ export default class Table extends Component {
   }
 
   initializeStates() {
+    const {
+      filterable,
+      def,
+      data,
+    } = this.props;
+
+    const filterCol = def.find(col => col.filterable);
+
     this.setState({
       sortedRows: this.props.data,
+      filterCol: filterCol && filterCol.key,
     });
   }
 
@@ -27,39 +38,75 @@ export default class Table extends Component {
       sortingCol,
       sortingDirection,
       sortedRows,
+      filterCol,
+      filterKeyword,
     } = this.state;
 
-    const { def } = this.props;
+    const {
+      def,
+      filterable,
+      data,
+    } = this.props;
 
     // Help function to sort rows according to given column
     const sortColumn = (col) => {
       // Figure out the current direction.
       // If column is not select, then set direction to be asc.
       // If it is already selected, set to be the opposite direction.
-      const dr = col.key !== sortingCol ? 'asc' :
-        sortingDirection === 'asc' ? 'desc' : 'asc';
-      const updatedRows = sortedRows.sort((a, b) => {
-        const attr1 = a[col.key];
-        const attr2 = b[col.key];
-        const defaultOrder = !attr1 ? -1 : !attr2 ? 1 : attr1.toString().localeCompare(attr2);
-        const order = col.onSort? col.onSort(attr1, attr2) : defaultOrder;
-        return dr === 'asc' ? order : -order;
-      });
+      if (col.sortable) {
+        const dr = col.key !== sortingCol ? 'asc' :
+          sortingDirection === 'asc' ? 'desc' : 'asc';
+        const updatedRows = data.sort((a, b) => {
+          const attr1 = a[col.key];
+          const attr2 = b[col.key];
+          const defaultOrder = !attr1 ? -1 : !attr2 ? 1 : attr1.toString().localeCompare(attr2);
+          const order = col.onSort? col.onSort(attr1, attr2) : defaultOrder;
+          return dr === 'asc' ? order : -order;
+        });
 
+        this.setState({
+          sortingCol: col.key,
+          sortingDirection: dr,
+          sortedRows: updatedRows,
+        });
+      }
+    };
+
+    // Take two params, Col and Keyword.
+    // Filter the data according to the parms
+    // and update the sorted Rows
+    const filterRows = (newCol, newKeyword) => {
+      const updatedRows = data.filter((row) => {
+        const cell = row[newCol];
+        return cell.includes(newKeyword);
+      });
       this.setState({
-        sortingCol: col.key,
-        sortingDirection: dr,
         sortedRows: updatedRows,
+        filterCol: newCol,
+        filterKeyword: newKeyword,
       });
     };
 
+    const changeFilterCol = (event) => {
+      filterRows(event.target.value, filterKeyword);
+    };
+
+    const changeFilterKeyword = (event) => {
+      filterRows(filterCol, event.target.value);
+    };
+
+    // Return the filter UI.
     const filterComponent = () => {
+      const options = def.filter(col => col.filterable)
+        .map(col => <option value={col.key}>{col.label}</option>);
       return (
         <div>
           <label htmlFor="filterCol">Filter:</label>
-          <input type="text" id="filterCol" />
+          <select name="filterCol" onChange={changeFilterCol}>
+            {options}
+          </select>
           <label htmlFor="filterKeyword">Keyword:</label>
-          <input type="text" id="filterKeyword" />
+          <input type="text" id="filterKeyword" onChange={changeFilterKeyword} />
         </div>
       );
     };
@@ -97,10 +144,13 @@ export default class Table extends Component {
     // Generate the whole table
     const generateTable = () => {
       return (
-        <table className="rwd-table">
-          { generateHeaders() }
-          { generateRows() }
-        </table>
+        <div className="rwd-table">
+          { filterable && filterComponent() }
+          <table>
+            { generateHeaders() }
+            { generateRows() }
+          </table>
+        </div>
       );
     };
 
@@ -119,4 +169,9 @@ Table.propTypes = {
       renderer: React.PropTypes.function,
     })).isRequired,
   data: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
+  filterable: React.PropTypes.bool,
+};
+
+Table.defaultProps = {
+  filterable: false,
 };
