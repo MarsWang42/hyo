@@ -61,29 +61,34 @@ export default class Table extends Component {
       newSortingDirection = sortingDirection,
       newFilterCol = filterCol,
       newFilterKeyword = filterKeyword,
+      filtering = false,
+      sorting = false,
     ) => {
+      let updatedRows = sortedRows
       // Take two params, Col and Keyword.
       // Filter the data according to the parms
       // and update the sorted Rows
       const newFilterType = def.find(col => col.key === newFilterCol).filterType;
-      let updatedRows = data.filter((row) => {
-        const cell = row[newFilterCol];
-        switch (newFilterType) {
-          case 'input':
-            return cell.toString().toLowerCase().includes(newFilterKeyword.toLowerCase());
-          case 'select':
-            // If it is a select filter, must match the whole keyword
-            if (newFilterKeyword === "") return true;
-            else return cell.toString() === newFilterKeyword;
-          default:
-            return cell.toString().toLowerCase().includes(newFilterKeyword.toLowerCase());
-        }
-      });
+      if (filtering) {
+        updatedRows = data.filter((row) => {
+          const cell = row[newFilterCol];
+          switch (newFilterType) {
+            case 'input':
+              return cell.toString().toLowerCase().includes(newFilterKeyword.toLowerCase());
+            case 'select':
+              // If it is a select filter, must match the whole keyword
+              if (newFilterKeyword === "") return true;
+              else return cell.toString() === newFilterKeyword;
+            default:
+              return cell.toString().toLowerCase().includes(newFilterKeyword.toLowerCase());
+          }
+        });
+      }
 
+      if (sorting && newSortingCol.sortable) {
       // Figure out the current direction.
       // If column is not select, then set direction to be asc.
       // If it is already selected, set to be the opposite direction.
-      if (newSortingCol.sortable) {
         updatedRows = updatedRows.sort((a, b) => {
           const attr1 = a[newSortingCol.key];
           const attr2 = b[newSortingCol.key];
@@ -105,18 +110,20 @@ export default class Table extends Component {
     };
 
     const sortColumn = (col) => {
-      const dr = col.key !== sortingCol.key ? 'asc' :
-        sortingDirection === 'asc' ? 'desc' : 'asc';
-      updateRows(col, dr);
+      if (col.sortable) {
+        const dr = col.key !== sortingCol.key ? 'asc' :
+          sortingDirection === 'asc' ? 'desc' : 'asc';
+        updateRows(col, dr, filterCol, filterKeyword, false, true);
+      }
     };
 
     // Clear keyword while changing filterCol
     const changeFilterCol = (event) => {
-      updateRows(sortingCol, sortingDirection, event.target.value, "");
+      updateRows(sortingCol, sortingDirection, event.target.value, "", true, true);
     };
 
     const changeFilterKeyword = (event) => {
-      updateRows(sortingCol, sortingDirection, filterCol, event.target.value);
+      updateRows(sortingCol, sortingDirection, filterCol, event.target.value, true, true);
     };
 
     /**
