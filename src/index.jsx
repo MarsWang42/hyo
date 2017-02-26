@@ -98,9 +98,10 @@ export default class Table extends Component {
     // Return the filter UI.
     const filterComponent = () => {
       const options = def.filter(col => col.filterable)
-        .map(col => <option value={col.key}>{col.label}</option>);
+        .map(col => 
+          <option key={`filter--${col.key}`} value={col.key}>{col.label}</option>);
       return (
-        <div>
+        <div className="filter">
           <label htmlFor="filterCol">Filter:</label>
           <select name="filterCol" onChange={changeFilterCol}>
             {options}
