@@ -84,7 +84,7 @@ export default class Table extends Component {
       // Filter the data according to the parms
       // and update the sorted Rows
       let newFilterType = filterType;
-      if (filtering) {
+      if (filtering && filterable) {
         newFilterType = def.find(col => col.key === newFilterCol).filterType;
         // Use the side effect of sort method.
         updatedRows = data.filter((row) => {
@@ -183,17 +183,20 @@ export default class Table extends Component {
      */
     const renderHeaders = () => {
       const headers = def.map((col) => {
-        const thClassName = cn({ sortable: col.sortable });
-        const spanClassName = cn({
-          sort: col.sortable,
-          sortup: col.sortable && col.key === sortingCol.key && sortingDirection === "asc",
-          sortdown: col.sortable && col.key === sortingCol.key && sortingDirection === "desc",
+        const thClassName = cn({
+          "hyo-th": true,
+          "sortable": col.sortable,
         });
-        return (<th key={col.key} className={thClassName} onClick={() => sortColumn(col)}>
+        const spanClassName = cn({
+          "sort": col.sortable,
+          "sortup": col.sortable && col.key === sortingCol.key && sortingDirection === "asc",
+          "sortdown": col.sortable && col.key === sortingCol.key && sortingDirection === "desc",
+        });
+        return (<div key={col.key} className={thClassName} onClick={() => sortColumn(col)}>
           {col.label}<span className={spanClassName} />
-        </th>);
+        </div>);
       });
-      return <thead><tr>{headers}</tr></thead>;
+      return <div className="hyo-thead"><div className="hyo-tr">{headers}</div></div>;
     };
 
     /**
@@ -204,12 +207,12 @@ export default class Table extends Component {
       const rows = sortedRows.map((row) => {
         i+=1;
         const cell = def.map(col =>
-          (<td key={`hyo-cell-${col.key}-${i}`}>
+          (<div className="hyo-td" key={`hyo-cell-${col.key}-${i}`}>
             { col.renderer? col.renderer(row[col.key]) : row[col.key] }
-          </td>));
-        return <tr key={`hyo-row-${i}`}>{ cell }</tr>;
+          </div>));
+        return <div className="hyo-tr" key={`hyo-row-${i}`}>{ cell }</div>;
       });
-      return <tbody>{ rows }</tbody>;
+      return <div className="hyo-tbody">{ rows }</div>;
     };
 
     /**
@@ -217,12 +220,12 @@ export default class Table extends Component {
      */
     const renderTable = () => {
       return (
-        <div className="rwd-table">
+        <div className="hyo">
           { filterable && renderFilter() }
-          <table>
+          <div className="hyo-table">
             { renderHeaders() }
             { renderRows() }
-          </table>
+          </div>
         </div>
       );
     };

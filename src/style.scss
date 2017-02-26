@@ -1,7 +1,7 @@
 $breakpoint-alpha: 480px;
 @import url('http://fonts.googleapis.com/css?family=Montserrat:300,400,700');
 
-.rwd-table {
+.hyo {
   font-family: Montserrat, sans-serif;
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
@@ -11,9 +11,14 @@ $breakpoint-alpha: 480px;
   min-width: 300px;
 
   .filter{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
     padding: 15px;
+
     select, input {
-      margin: 15px;
+      margin: 5px 15px;
       width: 20%;
       min-width: 160px;
       overflow-x: hidden;
@@ -44,47 +49,86 @@ $breakpoint-alpha: 480px;
     }
   }
 
-  table {
+  .hyo-table {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
     width: 100%;
     border-radius: .4em;
-    border: 1px solid black;
+    border: 1px solid rgba(0,0,0,.1);
     border-collapse: collapse;
+    overflow: auto;
+  }
 
-    tr:nth-child(even) {
+  .hyo-thead {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    background: rgba(0,0,0,.03);
+    border-bottom: 1px solid rgba(0,0,0,.15);
+    box-shadow: 0 2px 15px 0 rgba(0,0,0,.15);
+    .hyo-tr {
+      text-align: center;
+      display: inline-flex;
+
+      .hyo-th {
+        border-right: 1px solid rgba(0,0,0,.05);
+        &.sortable {
+          cursor: pointer;
+        }
+        .sort {
+          float: right;
+          margin-top: 8px;
+        }
+        .sortup {
+          width: 0;
+          height: 0;
+          border-left: 5px solid transparent;
+          border-right: 5px solid transparent;
+          border-bottom: 5px solid black;
+          text-align: right;
+        }
+        .sortdown {
+          width: 0;
+          height: 0;
+          border-left: 5px solid transparent;
+          border-right: 5px solid transparent;
+          border-top: 5px solid black;
+          text-align: right;
+        }
+        &:last-child {
+          border-right:0;
+        }
+      }
+    }
+  }
+
+  .hyo-tbody {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    .hyo-tr {
+      display: inline-flex;
+
+      .hyo-td {
+        border-right: 1px solid rgba(0,0,0,.02);
+        &:last-child {
+          border-right:0
+        }
+      }
+    }
+
+    .hyo-tr:nth-child(even) {
       background-color: #f2f2f2
     }
+  }
 
-    th, td {
-      padding: 15px;
-      text-align: left;
-      border: 1px solid #cccccc;
-    }
-    
-    th {
-      background-color: #f2f2f2;
-      &.sortable {
-        cursor: pointer;
-      }
-      .sort {
-        float: right;
-        margin-top: 8px;
-      }
-      .sortup {
-        width: 0;
-        height: 0;
-        border-left: 5px solid transparent;
-        border-right: 5px solid transparent;
-        border-bottom: 5px solid black;
-        text-align: right;
-      }
-      .sortdown {
-        width: 0;
-        height: 0;
-        border-left: 5px solid transparent;
-        border-right: 5px solid transparent;
-        border-top: 5px solid black;
-        text-align: right;
-      }
-    }
+  .hyo-th, .hyo-td{
+    flex: 1 0 0px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding: 7px 5px;
+    overflow: hidden;
   }
 }
