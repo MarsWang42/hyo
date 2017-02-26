@@ -8,9 +8,12 @@ export default class Table extends Component {
     this.state = {
       sortingCol: {},
       sortingDirection: "asc",
-      sortedRows: [],
+      pageRows: [],
       filterCol: "",
       filterKeyword: "",
+      currentPage: 1,
+      navigatorPage: 1,
+      resolvedRows: [],
     };
   }
 
@@ -25,14 +28,20 @@ export default class Table extends Component {
     const {
       def,
       data,
+      pageSize,
+      pagination,
     } = this.props;
 
     const filterCol = def.find(col => col.filterable);
+    const pages = pagination? Math.floor(data.length / pageSize)-1 : 0;
+    const pageRows = pagination ? data.slice(0, pageSize) : data;
 
     this.setState({
-      sortedRows: data,
+      pageRows,
+      resolvedRows: data,
       filterCol: filterCol && filterCol.key,
       filterType: filterCol && filterCol.filterType,
+      pages,
     });
   }
 
@@ -40,16 +49,22 @@ export default class Table extends Component {
     const {
       sortingCol,
       sortingDirection,
-      sortedRows,
+      pageRows,
       filterCol,
       filterKeyword,
       filterType,
+      pages,
+      currentPage,
+      resolvedRows,
+      navigatorPage,
     } = this.state;
 
     const {
       def,
       filterable,
       data,
+      pagination,
+      pageSize,
     } = this.props;
 
     /**
@@ -61,16 +76,18 @@ export default class Table extends Component {
       newSortingDirection = sortingDirection,
       newFilterCol = filterCol,
       newFilterKeyword = filterKeyword,
+      newCurrentPage = currentPage,
       filtering = false,
       sorting = false,
     ) => {
+      let newResolvedRows = resolvedRows;
       let updatedRows;
 
       if (sorting && newSortingCol.sortable) {
       // Figure out the current direction.
       // If column is not select, then set direction to be asc.
       // If it is already selected, set to be the opposite direction.
-        updatedRows = data.sort((a, b) => {
+        newResolvedRows = data.sort((a, b) => {
           const attr1 = a[newSortingCol.key];
           const attr2 = b[newSortingCol.key];
           const defaultOrder = !attr1 ? -1 : !attr2 ? 1 : attr1.toString().localeCompare(attr2);
@@ -87,7 +104,7 @@ export default class Table extends Component {
       if (filtering && filterable) {
         newFilterType = def.find(col => col.key === newFilterCol).filterType;
         // Use the side effect of sort method.
-        updatedRows = data.filter((row) => {
+        newResolvedRows = data.filter((row) => {
           const cell = row[newFilterCol];
           switch (newFilterType) {
             case 'input':
@@ -102,13 +119,23 @@ export default class Table extends Component {
         });
       }
 
+      // If Pagination, slice the resolved the data within current page.
+      if (pagination) {
+        const startRow = pageSize * (newCurrentPage - 1);
+        const endRow = Math.min(newResolvedRows.length, startRow + pageSize);
+        updatedRows = newResolvedRows.slice(startRow, endRow);
+      } else updatedRows = newResolvedRows;
+
       this.setState({
-        sortedRows: updatedRows,
+        pageRows: updatedRows,
         filterCol: newFilterCol,
         filterKeyword: newFilterKeyword,
         filterType: newFilterType,
         sortingCol: newSortingCol,
         sortingDirection: newSortingDirection,
+        currentPage: newCurrentPage,
+        navigatorPage: newCurrentPage,
+        resolvedRows: newResolvedRows,
       });
     };
 
@@ -116,17 +143,24 @@ export default class Table extends Component {
       if (col.sortable) {
         const dr = col.key !== sortingCol.key ? 'asc' :
           sortingDirection === 'asc' ? 'desc' : 'asc';
-        updateRows(col, dr, filterCol, filterKeyword, true, true);
+        updateRows(col, dr, filterCol, filterKeyword, currentPage, true, true);
       }
     };
 
     // Clear keyword while changing filterCol
     const changeFilterCol = (event) => {
-      updateRows(sortingCol, sortingDirection, event.target.value, "", true);
+      updateRows(sortingCol, sortingDirection, event.target.value, "", currentPage, true);
     };
 
     const changeFilterKeyword = (event) => {
-      updateRows(sortingCol, sortingDirection, filterCol, event.target.value, true);
+      updateRows(sortingCol, sortingDirection, filterCol, event.target.value, currentPage, true);
+    };
+
+    const changePage = (index) => {
+      updateRows(sortingCol, sortingDirection, filterCol, filterKeyword, index);
+    };
+
+    const jumpPage = (event) => {
     };
 
     /**
@@ -178,6 +212,74 @@ export default class Table extends Component {
       );
     };
 
+    /*
+     * Render the Pgination Controller.
+     */
+    const renderPagination = () => {
+      const totalRows = resolvedRows.length;
+      const startRow = (pageSize * (currentPage-1)) + 1;
+      const endRow = Math.min(totalRows, (startRow + pageSize) - 1);
+      return (
+        <div className="hyo-paginate">
+          <div>Showing {startRow} to {endRow} of {totalRows} entries</div>
+          <div className="navigator" >
+            <button
+              type="button"
+              disabled={currentPage === 1}
+              onClick={() => changePage(1)}
+            >
+              &lt;&lt;
+            </button>
+            <button
+              type="button"
+              disabled={currentPage === 1}
+              onClick={() => changePage(currentPage-1)}
+            >
+              &lt;
+            </button>
+            <div>
+              Go to Page
+              <input
+                type="text"
+                onKeyDown={(e) => {
+                  if (e.keyCode === 13) {
+                    changePage(e.target.value);
+                  }
+                }}
+                value={navigatorPage}
+                onChange={(e) => {
+                  let page = e.target.value;
+                  if (page === "") this.setState({ navigatorPage: page });
+                  else {
+                    page = Math.min(Math.max(0, e.target.value), pages);
+                    this.setState({ navigatorPage: page });
+                  }
+                }}
+                onBlur={(e) => {
+                  changePage(e.target.value);
+                }}
+              />
+              of {pages+1}
+            </div>
+            <button
+              type="button"
+              disabled={currentPage === pages+1}
+              onClick={() => changePage(currentPage+1)}
+            >
+              &gt;
+            </button>
+            <button
+              type="button"
+              disabled={currentPage === pages+1}
+              onClick={() => changePage(pages)}
+            >
+              &gt;&gt;
+            </button>
+          </div>
+        </div>
+      );
+    };
+
     /**
      * renderHeaders returns headers according to definition
      */
@@ -204,7 +306,7 @@ export default class Table extends Component {
      */
     const renderRows = () => {
       let i = 0;
-      const rows = sortedRows.map((row) => {
+      const rows = pageRows.map((row) => {
         i+=1;
         const cell = def.map(col =>
           (<div className="hyo-td" key={`hyo-cell-${col.key}-${i}`}>
@@ -225,6 +327,7 @@ export default class Table extends Component {
           <div className="hyo-table">
             { renderHeaders() }
             { renderRows() }
+            { pagination && renderPagination() }
           </div>
         </div>
       );
@@ -246,8 +349,12 @@ Table.propTypes = {
     })).isRequired,
   data: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
   filterable: React.PropTypes.bool,
+  pagination: React.PropTypes.bool,
+  pageSize: React.PropTypes.number,
 };
 
 Table.defaultProps = {
   filterable: false,
+  pagination: false,
+  pageSize: 0,
 };

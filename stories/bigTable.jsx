@@ -34,4 +34,4 @@ const def = [
   },
 ];
 
-export default () => <Table def={def} data={data} filterable />;
+export default () => <Table def={def} data={data} filterable pagination pageSize={10} />;

@@ -17,3 +17,7 @@ build/
 
 # Ignore Files
 .eslintignore
+
+# System Files
+.DS_STORE
+

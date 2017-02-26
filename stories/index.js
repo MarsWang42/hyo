@@ -3,10 +3,12 @@ import SimpleTable from './simpleTable';
 import SortableTable from './sortableTable';
 import FilterableTable from './filterableTable';
 import BigTable from './bigTable';
+import PaginationTable from './paginationTable';
 
 
 storiesOf('Hyo Tables', module)
   .add('Simple Table', SimpleTable)
   .add('Sortable Table', SortableTable)
   .add('Filterable Table', FilterableTable)
-  .add('5k lines Table', BigTable);
+  .add('5k lines Table', BigTable)
+  .add('Pagination Table', PaginationTable);
