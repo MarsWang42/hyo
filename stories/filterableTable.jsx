@@ -24,6 +24,7 @@ const def = [
     label: "Age",
     filterable: true,
     filterType: "input",
+    sortable: true,
   },
   {
     key: "birthday",

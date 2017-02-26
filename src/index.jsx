@@ -6,7 +6,7 @@ export default class Table extends Component {
   constructor() {
     super();
     this.state = {
-      sortingCol: "",
+      sortingCol: {},
       sortingDirection: "asc",
       sortedRows: [],
       filterCol: "",
@@ -18,9 +18,11 @@ export default class Table extends Component {
     this.initializeStates();
   }
 
+  /**
+   * initializeStates initializes the states with given props.
+   */
   initializeStates() {
     const {
-      filterable,
       def,
       data,
     } = this.props;
@@ -28,7 +30,7 @@ export default class Table extends Component {
     const filterCol = def.find(col => col.filterable);
 
     this.setState({
-      sortedRows: this.props.data,
+      sortedRows: data,
       filterCol: filterCol && filterCol.key,
       filterType: filterCol && filterCol.filterType,
     });
@@ -50,69 +52,79 @@ export default class Table extends Component {
       data,
     } = this.props;
 
-    // Help function to sort rows according to given column
-    const sortColumn = (col) => {
+    /**
+     * updateRows is a method to all of the rows
+     * being rendered as the body of table.
+     */
+    const updateRows = (
+      newSortingCol = sortingCol,
+      newSortingDirection = sortingDirection,
+      newFilterCol = filterCol,
+      newFilterKeyword = filterKeyword,
+    ) => {
+      // Take two params, Col and Keyword.
+      // Filter the data according to the parms
+      // and update the sorted Rows
+      const newFilterType = def.find(col => col.key === newFilterCol).filterType;
+      let updatedRows = data.filter((row) => {
+        const cell = row[newFilterCol];
+        switch (newFilterType) {
+          case 'input':
+            return cell.toString().toLowerCase().includes(newFilterKeyword.toLowerCase());
+          case 'select':
+            // If it is a select filter, must match the whole keyword
+            if (newFilterKeyword === "") return true;
+            else return cell.toString() === newFilterKeyword;
+          default:
+            return cell.toString().toLowerCase().includes(newFilterKeyword.toLowerCase());
+        }
+      });
+
       // Figure out the current direction.
       // If column is not select, then set direction to be asc.
       // If it is already selected, set to be the opposite direction.
-      if (col.sortable) {
-        const dr = col.key !== sortingCol ? 'asc' :
-          sortingDirection === 'asc' ? 'desc' : 'asc';
-        const updatedRows = data.sort((a, b) => {
-          const attr1 = a[col.key];
-          const attr2 = b[col.key];
+      if (newSortingCol.sortable) {
+        updatedRows = updatedRows.sort((a, b) => {
+          const attr1 = a[newSortingCol.key];
+          const attr2 = b[newSortingCol.key];
           const defaultOrder = !attr1 ? -1 : !attr2 ? 1 : attr1.toString().localeCompare(attr2);
-          const order = col.onSort? col.onSort(attr1, attr2) : defaultOrder;
-          return dr === 'asc' ? order : -order;
-        });
-
-        this.setState({
-          sortingCol: col.key,
-          sortingDirection: dr,
-          sortedRows: updatedRows,
+          // Here you can load the columns's onSort function if it has.
+          const order = newSortingCol.onSort? newSortingCol.onSort(attr1, attr2) : defaultOrder;
+          return newSortingDirection === 'asc' ? order : -order;
         });
       }
-    };
 
-    // Take two params, Col and Keyword.
-    // Filter the data according to the parms
-    // and update the sorted Rows
-    const filterRows = (newCol, newKeyword) => {
-      const newFilterType = def.find(col => col.key === newCol).filterType;
-      const updatedRows = data.filter((row) => {
-        const cell = row[newCol];
-        switch (newFilterType) {
-          case 'input':
-            return cell.toString().toLowerCase().includes(newKeyword.toLowerCase());
-          case 'select':
-            // If it is a select filter, must match the whole keyword
-            if (newKeyword === "") return true;
-            else return cell.toString() === newKeyword;
-          default:
-            return cell.toString().toLowerCase().includes(newKeyword.toLowerCase());
-        }
-      });
       this.setState({
         sortedRows: updatedRows,
-        filterCol: newCol,
-        filterKeyword: newKeyword,
+        filterCol: newFilterCol,
+        filterKeyword: newFilterKeyword,
         filterType: newFilterType,
+        sortingCol: newSortingCol,
+        sortingDirection: newSortingDirection,
       });
     };
 
-    // Clear keyword while changing FilterCol
+    const sortColumn = (col) => {
+      const dr = col.key !== sortingCol.key ? 'asc' :
+        sortingDirection === 'asc' ? 'desc' : 'asc';
+      updateRows(col, dr);
+    };
+
+    // Clear keyword while changing filterCol
     const changeFilterCol = (event) => {
-      filterRows(event.target.value, "");
+      updateRows(sortingCol, sortingDirection, event.target.value, "");
     };
 
     const changeFilterKeyword = (event) => {
-      filterRows(filterCol, event.target.value);
+      updateRows(sortingCol, sortingDirection, filterCol, event.target.value);
     };
 
-    // Return the filter UI.
-    const filterComponent = () => {
+    /**
+     * renderFilter is a function that returns the filter UI.
+     */
+    const renderFilter = () => {
       const options = def.filter(col => col.filterable)
-        .map(col => 
+        .map(col =>
           <option key={`filter-${col.key}`} value={col.key}>{col.label}</option>);
       const generateFilterKeyword = () => {
         switch (filterType) {
@@ -125,22 +137,25 @@ export default class Table extends Component {
             const l = data.length;
             const flags = {};
             const filterOptions = [];
-            filterOptions.push(<option disabled selected value> -- select -- </option>)
+            filterOptions.push(<option
+              key="empty-filter-option"
+              disabled value="default"> -- select -- </option>)
             for (let i = 0; i < l; i+=1) {
               const filterOption = data[i][filterCol];
-              if (flags[filterOption]) continue;
-              flags[filterOption] = true;
-              filterOptions.push(
-                <option key={`filteroption-${i}`} value={filterOption}>{filterOption}</option>);
+              if (!flags[filterOption]) {
+                flags[filterOption] = true;
+                filterOptions.push(
+                  <option key={`filteroption-${i}`} value={filterOption}>{filterOption}</option>);
+              }
             }
-            return (<select name="filterKeyworld" onChange={changeFilterKeyword} >
+            return (<select name="filterKeyworld" defaultValue="default" onChange={changeFilterKeyword} >
               {filterOptions}
             </select>);
           }
           default:
             return <input type="text" id="filterKeyword" onChange={changeFilterKeyword} />;
         }
-      }
+      };
       return (
         <div className="filter">
           <label htmlFor="filterCol">Filter:</label>
@@ -153,14 +168,16 @@ export default class Table extends Component {
       );
     };
 
-    // Generate headers according to definition
-    const generateHeaders = () => {
+    /**
+     * renderHeaders returns headers according to definition
+     */
+    const renderHeaders = () => {
       const headers = def.map((col) => {
         const thClassName = cn({ sortable: col.sortable });
         const spanClassName = cn({
           sort: col.sortable,
-          sortup: col.sortable && col.key === sortingCol && sortingDirection === "asc",
-          sortdown: col.sortable && col.key === sortingCol && sortingDirection === "desc",
+          sortup: col.sortable && col.key === sortingCol.key && sortingDirection === "asc",
+          sortdown: col.sortable && col.key === sortingCol.key && sortingDirection === "desc",
         });
         return (<th key={col.key} className={thClassName} onClick={() => sortColumn(col)}>
           {col.label}<span className={spanClassName} />
@@ -169,8 +186,10 @@ export default class Table extends Component {
       return <thead><tr>{headers}</tr></thead>;
     };
 
-    // Render each row according to data
-    const generateRows = () => {
+    /**
+     * renderRows returns each row according to data.
+     */
+    const renderRows = () => {
       let i = 0;
       const rows = sortedRows.map((row) => {
         i+=1;
@@ -183,21 +202,23 @@ export default class Table extends Component {
       return <tbody>{ rows }</tbody>;
     };
 
-    // Generate the whole table
-    const generateTable = () => {
+    /**
+     * renderTable generates the whole table.
+     */
+    const renderTable = () => {
       return (
         <div className="rwd-table">
-          { filterable && filterComponent() }
+          { filterable && renderFilter() }
           <table>
-            { generateHeaders() }
-            { generateRows() }
+            { renderHeaders() }
+            { renderRows() }
           </table>
         </div>
       );
     };
 
 
-    return generateTable();
+    return renderTable();
   }
 }
 
