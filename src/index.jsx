@@ -30,6 +30,7 @@ export default class Table extends Component {
     this.setState({
       sortedRows: this.props.data,
       filterCol: filterCol && filterCol.key,
+      filterType: filterCol && filterCol.filterType,
     });
   }
 
@@ -40,6 +41,7 @@ export default class Table extends Component {
       sortedRows,
       filterCol,
       filterKeyword,
+      filterType,
     } = this.state;
 
     const {
@@ -76,19 +78,31 @@ export default class Table extends Component {
     // Filter the data according to the parms
     // and update the sorted Rows
     const filterRows = (newCol, newKeyword) => {
+      const newFilterType = def.find(col => col.key === newCol).filterType;
       const updatedRows = data.filter((row) => {
         const cell = row[newCol];
-        return cell.includes(newKeyword);
+        switch (newFilterType) {
+          case 'input':
+            return cell.toString().toLowerCase().includes(newKeyword.toLowerCase());
+          case 'select':
+            // If it is a select filter, must match the whole keyword
+            if (newKeyword === "") return true;
+            else return cell.toString() === newKeyword;
+          default:
+            return cell.toString().toLowerCase().includes(newKeyword.toLowerCase());
+        }
       });
       this.setState({
         sortedRows: updatedRows,
         filterCol: newCol,
         filterKeyword: newKeyword,
+        filterType: newFilterType,
       });
     };
 
+    // Clear keyword while changing FilterCol
     const changeFilterCol = (event) => {
-      filterRows(event.target.value, filterKeyword);
+      filterRows(event.target.value, "");
     };
 
     const changeFilterKeyword = (event) => {
@@ -99,7 +113,34 @@ export default class Table extends Component {
     const filterComponent = () => {
       const options = def.filter(col => col.filterable)
         .map(col => 
-          <option key={`filter--${col.key}`} value={col.key}>{col.label}</option>);
+          <option key={`filter-${col.key}`} value={col.key}>{col.label}</option>);
+      const generateFilterKeyword = () => {
+        switch (filterType) {
+          case 'input': {
+            return <input type="text" id="filterKeyword" onChange={changeFilterKeyword} />;
+          }
+          // For select filter, checkout all unique value in the column
+          // and put them in options.
+          case 'select': {
+            const l = data.length;
+            const flags = {};
+            const filterOptions = [];
+            filterOptions.push(<option disabled selected value> -- select -- </option>)
+            for (let i = 0; i < l; i+=1) {
+              const filterOption = data[i][filterCol];
+              if (flags[filterOption]) continue;
+              flags[filterOption] = true;
+              filterOptions.push(
+                <option key={`filteroption-${i}`} value={filterOption}>{filterOption}</option>);
+            }
+            return (<select name="filterKeyworld" onChange={changeFilterKeyword} >
+              {filterOptions}
+            </select>);
+          }
+          default:
+            return <input type="text" id="filterKeyword" onChange={changeFilterKeyword} />;
+        }
+      }
       return (
         <div className="filter">
           <label htmlFor="filterCol">Filter:</label>
@@ -107,7 +148,7 @@ export default class Table extends Component {
             {options}
           </select>
           <label htmlFor="filterKeyword">Keyword:</label>
-          <input type="text" id="filterKeyword" onChange={changeFilterKeyword} />
+          { generateFilterKeyword() }
         </div>
       );
     };

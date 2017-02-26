@@ -17,10 +17,13 @@ const def = [
     key: "gender",
     label: "Gender",
     filterable: true,
+    filterType: "select",
   },
   {
     key: "age",
     label: "Age",
+    filterable: true,
+    filterType: "input",
   },
   {
     key: "birthday",
