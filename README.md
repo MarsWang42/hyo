@@ -1,2 +1,2 @@
-# Hyo :mount_fuji:
+# Hyo :japanese_castle:
 \- A light-weight datatable for React
