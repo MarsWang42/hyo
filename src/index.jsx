@@ -64,13 +64,29 @@ export default class Table extends Component {
       filtering = false,
       sorting = false,
     ) => {
-      let updatedRows = sortedRows
+      let updatedRows;
+
+      if (sorting && newSortingCol.sortable) {
+      // Figure out the current direction.
+      // If column is not select, then set direction to be asc.
+      // If it is already selected, set to be the opposite direction.
+        updatedRows = data.sort((a, b) => {
+          const attr1 = a[newSortingCol.key];
+          const attr2 = b[newSortingCol.key];
+          const defaultOrder = !attr1 ? -1 : !attr2 ? 1 : attr1.toString().localeCompare(attr2);
+          // Here you can load the columns's onSort function if it has.
+          const order = newSortingCol.onSort? newSortingCol.onSort(attr1, attr2) : defaultOrder;
+          return newSortingDirection === 'asc' ? order : -order;
+        });
+      }
+
       // Take two params, Col and Keyword.
       // Filter the data according to the parms
       // and update the sorted Rows
       let newFilterType = filterType;
       if (filtering) {
         newFilterType = def.find(col => col.key === newFilterCol).filterType;
+        // Use the side effect of sort method.
         updatedRows = data.filter((row) => {
           const cell = row[newFilterCol];
           switch (newFilterType) {
@@ -83,20 +99,6 @@ export default class Table extends Component {
             default:
               return cell.toString().toLowerCase().includes(newFilterKeyword.toLowerCase());
           }
-        });
-      }
-
-      if (sorting && newSortingCol.sortable) {
-      // Figure out the current direction.
-      // If column is not select, then set direction to be asc.
-      // If it is already selected, set to be the opposite direction.
-        updatedRows = updatedRows.sort((a, b) => {
-          const attr1 = a[newSortingCol.key];
-          const attr2 = b[newSortingCol.key];
-          const defaultOrder = !attr1 ? -1 : !attr2 ? 1 : attr1.toString().localeCompare(attr2);
-          // Here you can load the columns's onSort function if it has.
-          const order = newSortingCol.onSort? newSortingCol.onSort(attr1, attr2) : defaultOrder;
-          return newSortingDirection === 'asc' ? order : -order;
         });
       }
 
@@ -114,17 +116,17 @@ export default class Table extends Component {
       if (col.sortable) {
         const dr = col.key !== sortingCol.key ? 'asc' :
           sortingDirection === 'asc' ? 'desc' : 'asc';
-        updateRows(col, dr, filterCol, filterKeyword, false, true);
+        updateRows(col, dr, filterCol, filterKeyword, true, true);
       }
     };
 
     // Clear keyword while changing filterCol
     const changeFilterCol = (event) => {
-      updateRows(sortingCol, sortingDirection, event.target.value, "", true, true);
+      updateRows(sortingCol, sortingDirection, event.target.value, "", true);
     };
 
     const changeFilterKeyword = (event) => {
-      updateRows(sortingCol, sortingDirection, filterCol, event.target.value, true, true);
+      updateRows(sortingCol, sortingDirection, filterCol, event.target.value, true);
     };
 
     /**
