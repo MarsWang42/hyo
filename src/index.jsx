@@ -68,8 +68,9 @@ export default class Table extends Component {
       // Take two params, Col and Keyword.
       // Filter the data according to the parms
       // and update the sorted Rows
-      const newFilterType = def.find(col => col.key === newFilterCol).filterType;
+      let newFilterType = filterType;
       if (filtering) {
+        newFilterType = def.find(col => col.key === newFilterCol).filterType;
         updatedRows = data.filter((row) => {
           const cell = row[newFilterCol];
           switch (newFilterType) {
