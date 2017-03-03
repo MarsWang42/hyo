@@ -263,7 +263,7 @@ export default class Table extends Component {
             <button
               type="button"
               disabled={currentPage === pages+1}
-              onClick={() => changePage(pages)}
+              onClick={() => changePage(pages+1)}
             >
               &gt;&gt;
             </button>
