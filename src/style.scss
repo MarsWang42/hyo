@@ -15,6 +15,7 @@ $breakpoint-alpha: 480px;
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
+    flex-wrap: wrap;
     padding: 15px;
 
     .Dropdown-root {
@@ -33,6 +34,22 @@ $breakpoint-alpha: 480px;
       outline: none;
       padding: 8px 52px 8px 10px;
       transition: all 200ms ease;
+    }
+
+    .Dropdown-remove {
+      padding: 8px 52px 8px 30px;
+      .remove-btn {
+        position: absolute;
+        left: 10px;
+        top: 11px;
+        display: inline-block;
+        cursor: pointer;
+        background-image: url('/delete_picker.svg');
+        width: 15px;
+        height: 15px;
+        min-width: 15px;
+        min-height: 15px;
+      }
     }
 
     .Dropdown-control:hover {
@@ -104,26 +121,39 @@ $breakpoint-alpha: 480px;
       padding: 8px 10px;
     }
 
-    .Dropdown-root, input {
+    .Dropdown-root, .text-filter{
       margin: 5px 15px;
-      width: 20%;
       min-width: 160px;
     }
 
-    input {
-      font-family: Montserrat, sans-serif;
-      font-size:14px;
-      padding:10px 10px 10px 5px;
-      display:block;
-      background-color: white;
-      border: 1px solid #ccc;
-      border-radius: 2px;
-      box-sizing: border-box;
-      color: #333;
-      cursor: default;
-      outline: none;
-      padding: 8px 52px 8px 10px;
-      transition: all 200ms ease;
+    .text-filter {
+      position: relative;
+      .clear-btn {
+        position: absolute;
+        left: 10px;
+        top: 11px;
+        display: inline-block;
+        cursor: pointer;
+        background-image: url('/delete_picker.svg');
+        width: 15px;
+        height: 15px;
+        min-width: 15px;
+        min-height: 15px;
+      }
+
+      input {
+        font-family: Montserrat, sans-serif;
+        font-size:14px;
+        display:block;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 2px;
+        box-sizing: border-box;
+        color: #333;
+        cursor: default;
+        outline: none;
+        padding: 8px 20px 8px 30px;
+      }
     }
   }
 

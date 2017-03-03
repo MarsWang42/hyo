@@ -10,11 +10,10 @@ export default class Table extends Component {
       sortingCol: {},
       sortingDirection: "asc",
       pageRows: [],
-      filterCol: "",
-      filterKeyword: "",
       currentPage: 1,
       navigatorPage: 1,
       resolvedRows: [],
+      filters: [],
     };
   }
 
@@ -33,15 +32,12 @@ export default class Table extends Component {
       pagination,
     } = this.props;
 
-    const filterCol = def.find(col => col.filterable);
     const pages = pagination? Math.floor(data.length / pageSize)-1 : 0;
     const pageRows = pagination ? data.slice(0, pageSize) : data;
 
     this.setState({
       pageRows,
       resolvedRows: data,
-      filterCol: filterCol && filterCol.key,
-      filterType: filterCol && filterCol.filterType,
       pages,
     });
   }
@@ -51,13 +47,11 @@ export default class Table extends Component {
       sortingCol,
       sortingDirection,
       pageRows,
-      filterCol,
-      filterKeyword,
-      filterType,
       pages,
       currentPage,
       resolvedRows,
       navigatorPage,
+      filters,
     } = this.state;
 
     const {
@@ -75,8 +69,7 @@ export default class Table extends Component {
     const updateRows = (
       newSortingCol = sortingCol,
       newSortingDirection = sortingDirection,
-      newFilterCol = filterCol,
-      newFilterKeyword = filterKeyword,
+      newFilters = filters,
       newCurrentPage = currentPage,
       filtering = false,
       sorting = false,
@@ -101,23 +94,26 @@ export default class Table extends Component {
       // Take two params, Col and Keyword.
       // Filter the data according to the parms
       // and update the sorted Rows
-      let newFilterType = filterType;
       if (filtering && filterable) {
-        newFilterType = def.find(col => col.key === newFilterCol).filterType;
-        // Use the side effect of sort method.
-        newResolvedRows = data.filter((row) => {
-          const cell = row[newFilterCol];
-          switch (newFilterType) {
-            case 'input':
-              return cell.toString().toLowerCase().includes(newFilterKeyword.toLowerCase());
-            case 'select':
-              // If it is a select filter, must match the whole keyword
-              if (newFilterKeyword === "") return true;
-              else return cell.toString() === newFilterKeyword;
-            default:
-              return cell.toString().toLowerCase().includes(newFilterKeyword.toLowerCase());
-          }
-        });
+        let filteredRows = [...data];
+        for (let i = 0, length = newFilters.length; i < length; i++) {
+          // Use the side effect of sort method.
+          filteredRows = filteredRows.filter((row) => {
+            const keyword = newFilters[i].keyword;
+            const cell = row[newFilters[i].key];
+            switch (newFilters[i].filterType) {
+              case 'input':
+                return cell.toString().toLowerCase().includes(keyword.toLowerCase());
+              case 'select':
+                // If it is a select filter, must match the whole keyword
+                if (keyword === "") return true;
+                else return cell.toString() === keyword;
+              default:
+                return cell.toString().toLowerCase().includes(keyword.toLowerCase());
+            }
+          });
+        }
+        newResolvedRows = filteredRows;
       }
 
       // If Pagination, slice the resolved the data within current page.
@@ -131,9 +127,7 @@ export default class Table extends Component {
 
       this.setState({
         pageRows: updatedRows,
-        filterCol: newFilterCol,
-        filterKeyword: newFilterKeyword,
-        filterType: newFilterType,
+        filters: newFilters,
         sortingCol: newSortingCol,
         sortingDirection: newSortingDirection,
         currentPage: newCurrentPage,
@@ -147,61 +141,90 @@ export default class Table extends Component {
       if (col.sortable) {
         const dr = col.key !== sortingCol.key ? 'asc' :
           sortingDirection === 'asc' ? 'desc' : 'asc';
-        updateRows(col, dr, filterCol, filterKeyword, currentPage, true, true);
+        updateRows(col, dr, filters, currentPage, true, true);
       }
     };
 
-    // Clear keyword while changing filterCol
-    const changeFilterCol = (col) => {
-      updateRows(sortingCol, sortingDirection, col.key, "", currentPage, true);
+    const addFilter = (filter) => {
+      const type = def.find(col => col.key === filter.key).filterType;
+      const newFilters = [...filters];
+      newFilters.push({ key: filter.key, keyword: "", filterType: type, label: filter.label });
+      updateRows(sortingCol, sortingDirection, newFilters, currentPage, true);
     };
 
-    const changeFilterKeyword = (keyword) => {
-      updateRows(sortingCol, sortingDirection, filterCol, keyword, currentPage, true);
+    const removeFilter = (col) => {
+      let newFilters = [...filters];
+      newFilters = newFilters.filter(filter => filter.key !== col);
+      updateRows(sortingCol, sortingDirection, newFilters, currentPage, true);
+    };
+
+    const updateFilter = (col, keyword) => {
+      let newFilters = [...filters];
+      const updatedFilter = newFilters.find(filter => filter.key === col);
+      updatedFilter.keyword = keyword;
+      updateRows(sortingCol, sortingDirection, newFilters, currentPage, true);
     };
 
     const changePage = (index) => {
-      updateRows(sortingCol, sortingDirection, filterCol, filterKeyword, index);
-    };
-
-    const jumpPage = (event) => {
+      updateRows(sortingCol, sortingDirection, filters, index);
     };
 
     /**
      * renderFilter is a function that returns the filter UI.
      */
     const renderFilter = () => {
-      const options = def.filter(col => col.filterable);
-      const generateFilterKeyword = () => {
-        switch (filterType) {
-          case 'input': {
-            return <input type="text" id="filterKeyword" onChange={e => changeFilterKeyword(e.target.value)} placeholder="Keyword..." />;
-          }
-          // For select filter, checkout all unique value in the column
-          // and put them in options.
-          case 'select': {
-            const l = data.length;
-            const flags = {};
-            const filterOptions = [{ key: "", label: "all" }];
-            for (let i = 0; i < l; i+=1) {
-              const filterOption = data[i][filterCol];
-              if (!flags[filterOption]) {
-                flags[filterOption] = true;
-                filterOptions.push(filterOption);
-              }
+      const options = def.filter(col =>
+        col.filterable && filters.find(filter => filter.key === col.key) === undefined);
+      const generateFilters = () => {
+        if (filters.length === 0) return;
+        // render all filters being added
+        return filters.map((filter) => {
+          const defaultFilter = (
+            <div className="text-filter" key={`${filter.key}-filter`}>
+              <input
+                type="text"
+                id={`${filter.key}-filter`}
+                onChange={e => updateFilter(filter.key, e.target.value)}
+                placeholder={`${filter.label}`}
+              />
+              <span className="clear-btn" onClick={() => removeFilter(filter.key)} />
+            </div>
+          );
+          switch (filter.filterType) {
+            case 'input': {
+              return defaultFilter;
             }
-            return <Dropdown options={filterOptions} onChange={col => changeFilterKeyword(col.key)} />;
+            // For select filter, checkout all unique value in the column
+            // and put them in options.
+            case 'select': {
+              const l = data.length;
+              const flags = {};
+              const filterOptions = [{ key: "", label: "all" }];
+              for (let i = 0; i < l; i+=1) {
+                const filterOption = data[i][filter.key];
+                if (!flags[filterOption]) {
+                  flags[filterOption] = true;
+                  filterOptions.push(filterOption);
+                }
+              }
+              return (<Dropdown
+                options={filterOptions}
+                key={`${filter.key}-filter`}
+                onChange={col => updateFilter(filter.key, col.key)}
+                remove
+                onRemove={()=> removeFilter(filter.key)}
+                placeholder={`${filter.label} Filter`}
+              />);
+            }
+            default:
+              return defaultFilter;
           }
-          default:
-            return <input type="text" id="filterKeyword" onChange={e => changeFilterKeyword(e.target.value)} placeholder="Keyword..." />;
-        }
+        });
       };
       return (
         <div className="filter">
-          <label htmlFor="filterCol">Filter:</label>
-          <Dropdown options={options} onChange={col => changeFilterCol(col)} />
-          <label htmlFor="filterKeyword">Keyword:</label>
-          { generateFilterKeyword() }
+          <Dropdown options={options} onChange={col => addFilter(col)} shownText="Add a filter" />
+          { generateFilters() }
         </div>
       );
     };
@@ -243,7 +266,6 @@ export default class Table extends Component {
                 value={navigatorPage}
                 onChange={(e) => {
                   let page = e.target.value;
-                  console.log(pages);
                   if (page === "") this.setState({ navigatorPage: page });
                   else {
                     page = Math.min(Math.max(0, e.target.value), pages+1);
@@ -289,7 +311,7 @@ export default class Table extends Component {
           "sortup": col.sortable && col.key === sortingCol.key && sortingDirection === "asc",
           "sortdown": col.sortable && col.key === sortingCol.key && sortingDirection === "desc",
         });
-        return (<div key={col.key} className={thClassName} onClick={() => sortColumn(col)}>
+        return (<div key={`${col.key}-header`} className={thClassName} onClick={() => sortColumn(col)}>
           {col.label}<span className={spanClassName} />
         </div>);
       });

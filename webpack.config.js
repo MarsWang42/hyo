@@ -26,6 +26,9 @@ var config = {
     filename: outputFile,
   },
   devtool: 'source-map',
+  resolve: {
+    extensions: ['*', '.js', '.jsx']
+  },
   module : {
     loaders : [
       {
@@ -42,6 +45,7 @@ var config = {
   },
   externals: {
     "react": "React",
+    "react-dom": "ReactDOM",
   },
   plugins: plugins,
 };

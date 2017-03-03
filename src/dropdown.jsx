@@ -16,6 +16,7 @@ export default class Dropdown extends Component {
     this.triggerChangeEvent = this.triggerChangeEvent.bind(this);
     this.handleMouseDown = this.handleMouseDown.bind(this);
     this.setValue = this.setValue.bind(this);
+    this.onRemove = this.onRemove.bind(this);
     this.hideDropdown = this.hideDropdown.bind(this);
   }
 
@@ -44,7 +45,6 @@ export default class Dropdown extends Component {
       },
       isOpen: false,
     };
-    console.log(newState)
     this.triggerChangeEvent(newState);
     this.setState(newState);
   }
@@ -65,12 +65,23 @@ export default class Dropdown extends Component {
    */
   handleMouseDown(event) {
     if (event.type === 'mousedown' && event.button !== 0) return;
+    event.cancelBubble = true;
     event.stopPropagation();
     event.preventDefault();
+    console.log('a')
 
     this.setState({
       isOpen: !this.state.isOpen,
     });
+  }
+
+  onRemove(event) {
+    if (event.type === 'mousedown' && event.button !== 0) return;
+    event.cancelBubble = true;
+    event.preventDefault();
+    event.stopPropagation();
+    this.props.onRemove();
+    return false
   }
 
   /*
@@ -106,7 +117,7 @@ export default class Dropdown extends Component {
 
     return (
       <div
-        key={key}
+        key={`${key}-add-filter`}
         className={optionClass}
         onMouseDown={() => this.setValue(key, label)}
         onClick={() => this.setValue(key, label)}
@@ -117,25 +128,29 @@ export default class Dropdown extends Component {
   }
 
   render() {
-    const disabledClass = this.props.disabled ? 'Dropdown-disabled' : '';
-    const placeHolderValue = typeof this.state.selected === 'string' ? this.state.selected : this.state.selected.label;
-    const key = (<div className={`Dropdown-placeholder`}>{placeHolderValue}</div>);
-    const menu = this.state.isOpen ? <div className={`Dropdown-menu`}>{this.buildMenu()}</div> : null;
+    const { disabled, remove, shownText } = this.props;
+    const { selected, isOpen } = this.state;
+    const removeClass = remove? 'Dropdown-remove' : '';
+    const disabledClass = disabled ? 'Dropdown-disabled' : '';
+    const placeHolderValue = typeof selected === 'string' ? selected : selected.label;
+    const key = (<div className="Dropdown-placeholder">{shownText || placeHolderValue}</div>);
+    const menu = isOpen ? <div className="Dropdown-menu">{this.buildMenu()}</div> : null;
 
     const dropdownClass = cn({
       'Dropdown-root': true,
-      'is-open': this.state.isOpen,
+      'is-open': isOpen,
     });
 
     return (
       <div className={dropdownClass}>
         <div
-          className={`Dropdown-control ${disabledClass}`}
+          className={`Dropdown-control ${disabledClass} ${removeClass}`}
           onMouseDown={this.handleMouseDown}
           onTouchEnd={this.handleMouseDown}
         >
           {key}
-          <span className={`Dropdown-arrow`} />
+          <span className="Dropdown-arrow" />
+          {remove && <span className="remove-btn" onMouseDown={this.onRemove} onTouchEnd={this.onRemove}/>}
         </div>
         {menu}
       </div>
@@ -155,10 +170,14 @@ Dropdown.propTypes = {
   placeholder: PropTypes.string,
   disabled: PropTypes.bool,
   onChange: PropTypes.func,
+  remove: PropTypes.bool,
+  shownText: PropTypes.string,
 };
 
 Dropdown.defaultProps = {
   placeholder: "",
   disabled: false,
   onChange: undefined,
+  remove: false,
+  shownText: "",
 };
