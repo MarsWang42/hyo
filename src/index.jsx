@@ -121,9 +121,11 @@ export default class Table extends Component {
       }
 
       // If Pagination, slice the resolved the data within current page.
+      let newPages = 0;
       if (pagination) {
         const startRow = pageSize * (newCurrentPage - 1);
         const endRow = Math.min(newResolvedRows.length, startRow + pageSize);
+        newPages = Math.floor(newResolvedRows.length / pageSize)-1;
         updatedRows = newResolvedRows.slice(startRow, endRow);
       } else updatedRows = newResolvedRows;
 
@@ -137,6 +139,7 @@ export default class Table extends Component {
         currentPage: newCurrentPage,
         navigatorPage: newCurrentPage,
         resolvedRows: newResolvedRows,
+        pages: newPages,
       });
     };
 
@@ -154,7 +157,6 @@ export default class Table extends Component {
     };
 
     const changeFilterKeyword = (keyword) => {
-      console.log(keyword)
       updateRows(sortingCol, sortingDirection, filterCol, keyword, currentPage, true);
     };
 
@@ -173,14 +175,14 @@ export default class Table extends Component {
       const generateFilterKeyword = () => {
         switch (filterType) {
           case 'input': {
-            return <input type="text" id="filterKeyword" onChange={changeFilterKeyword} />;
+            return <input type="text" id="filterKeyword" onChange={e => changeFilterKeyword(e.target.value)} placeholder="Keyword..." />;
           }
           // For select filter, checkout all unique value in the column
           // and put them in options.
           case 'select': {
             const l = data.length;
             const flags = {};
-            const filterOptions = [{key: "", label: "all"}];
+            const filterOptions = [{ key: "", label: "all" }];
             for (let i = 0; i < l; i+=1) {
               const filterOption = data[i][filterCol];
               if (!flags[filterOption]) {
@@ -191,7 +193,7 @@ export default class Table extends Component {
             return <Dropdown options={filterOptions} onChange={col => changeFilterKeyword(col.key)} />;
           }
           default:
-            return <input type="text" id="filterKeyword" onChange={e => changeFilterKeyword(e.target.value)} />;
+            return <input type="text" id="filterKeyword" onChange={e => changeFilterKeyword(e.target.value)} placeholder="Keyword..." />;
         }
       };
       return (
@@ -241,9 +243,10 @@ export default class Table extends Component {
                 value={navigatorPage}
                 onChange={(e) => {
                   let page = e.target.value;
+                  console.log(pages);
                   if (page === "") this.setState({ navigatorPage: page });
                   else {
-                    page = Math.min(Math.max(0, e.target.value), pages);
+                    page = Math.min(Math.max(0, e.target.value), pages+1);
                     this.setState({ navigatorPage: page });
                   }
                 }}
