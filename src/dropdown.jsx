@@ -6,6 +6,7 @@ export default class Dropdown extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      options: props.options,
       selected: {
         label: props.placeholder || "Select",
         key: '',
@@ -65,10 +66,8 @@ export default class Dropdown extends Component {
    */
   handleMouseDown(event) {
     if (event.type === 'mousedown' && event.button !== 0) return;
-    event.cancelBubble = true;
     event.stopPropagation();
     event.preventDefault();
-    console.log('a')
 
     this.setState({
       isOpen: !this.state.isOpen,
@@ -77,7 +76,6 @@ export default class Dropdown extends Component {
 
   onRemove(event) {
     if (event.type === 'mousedown' && event.button !== 0) return;
-    event.cancelBubble = true;
     event.preventDefault();
     event.stopPropagation();
     this.props.onRemove();
@@ -93,14 +91,31 @@ export default class Dropdown extends Component {
     }
   }
 
+  changeFilter(filter) {
+
+  }
+
   /*
    * build Menu generate the dropdown menu
    */
   buildMenu() {
-    const { options } = this.props;
-    const ops = options.map(option => this.renderOption(option));
+    const { filterable } = this.props;
+    const { options } = this.state;
+    const ops = [];
+    const renderFilter = () => (
+      <div className="Dropdown-filter" key="dropdown-filter">
+        <input type="text" onChange={this.changeFilter} />
+        <span className="search-btn" />
+      </div>
+    );
+    if (filterable) ops.push(renderFilter());
+    if (options.length) ops.push(
+      options.filter(option =>
+          option.toString().toLowerCase().includes(option.toLowerCase()))
+        .map(option => this.renderOption(option)));
+    else ops.push(<div className="Dropdown-noresults">No options found</div>);
 
-    return ops.length ? ops : <div className="Dropdown-noresults">No options found</div>;
+    return ops;
   }
 
   /*
@@ -128,7 +143,7 @@ export default class Dropdown extends Component {
   }
 
   render() {
-    const { disabled, remove, shownText } = this.props;
+    const { disabled, remove, shownText, filterable } = this.props;
     const { selected, isOpen } = this.state;
     const removeClass = remove? 'Dropdown-remove' : '';
     const disabledClass = disabled ? 'Dropdown-disabled' : '';

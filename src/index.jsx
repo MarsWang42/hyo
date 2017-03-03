@@ -213,6 +213,7 @@ export default class Table extends Component {
                 onChange={col => updateFilter(filter.key, col.key)}
                 remove
                 onRemove={()=> removeFilter(filter.key)}
+                filterable
                 placeholder={`${filter.label} Filter`}
               />);
             }

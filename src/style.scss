@@ -20,6 +20,8 @@ $breakpoint-alpha: 480px;
 
     .Dropdown-root {
       position: relative;
+      font-family: Montserrat, sans-serif;
+      font-size:14px;
     }
 
     .Dropdown-control {
@@ -37,7 +39,7 @@ $breakpoint-alpha: 480px;
     }
 
     .Dropdown-remove {
-      padding: 8px 52px 8px 30px;
+      padding: 8px 52px 8px 34px;
       .remove-btn {
         position: absolute;
         left: 10px;
@@ -49,6 +51,9 @@ $breakpoint-alpha: 480px;
         height: 15px;
         min-width: 15px;
         min-height: 15px;
+        background-size: 100%;
+        background-position: center center;
+        background-repeat: no-repeat;
       }
     }
 
@@ -76,6 +81,8 @@ $breakpoint-alpha: 480px;
     }
 
     .Dropdown-menu {
+      display: flex;
+      flex-direction: column;
       background-color: white;
       border: 1px solid #ccc;
       box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
@@ -88,6 +95,34 @@ $breakpoint-alpha: 480px;
       width: 100%;
       z-index: 1000;
       -webkit-overflow-scrolling: touch;
+    }
+
+    .Dropdown-filter {
+      width: 90%;
+      align-self: center;
+      margin: 5px 0;
+      input {
+        box-sizing: border-box;
+        width: 100%;
+        font-size: 14px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        padding: 5px 30px 5px 5px;
+      }
+      .search-btn {
+        position: absolute;
+        right: 18px;
+        top: 13px;
+        display: inline-block;
+        background-image: url('/active-search.svg');
+        width: 15px;
+        height: 15px;
+        min-width: 15px;
+        min-height: 15px;
+        background-size: 100%;
+        background-position: center center;
+        background-repeat: no-repeat;
+      }
     }
 
     .Dropdown-option {
