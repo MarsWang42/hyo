@@ -1,5 +1,6 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import cn from 'classnames';
+import Dropdown from './dropdown';
 import './style.scss';
 
 export default class Table extends Component {
@@ -148,12 +149,13 @@ export default class Table extends Component {
     };
 
     // Clear keyword while changing filterCol
-    const changeFilterCol = (event) => {
-      updateRows(sortingCol, sortingDirection, event.target.value, "", currentPage, true);
+    const changeFilterCol = (col) => {
+      updateRows(sortingCol, sortingDirection, col.key, "", currentPage, true);
     };
 
-    const changeFilterKeyword = (event) => {
-      updateRows(sortingCol, sortingDirection, filterCol, event.target.value, currentPage, true);
+    const changeFilterKeyword = (keyword) => {
+      console.log(keyword)
+      updateRows(sortingCol, sortingDirection, filterCol, keyword, currentPage, true);
     };
 
     const changePage = (index) => {
@@ -167,9 +169,7 @@ export default class Table extends Component {
      * renderFilter is a function that returns the filter UI.
      */
     const renderFilter = () => {
-      const options = def.filter(col => col.filterable)
-        .map(col =>
-          <option key={`filter-${col.key}`} value={col.key}>{col.label}</option>);
+      const options = def.filter(col => col.filterable);
       const generateFilterKeyword = () => {
         switch (filterType) {
           case 'input': {
@@ -180,32 +180,24 @@ export default class Table extends Component {
           case 'select': {
             const l = data.length;
             const flags = {};
-            const filterOptions = [];
-            filterOptions.push(<option
-              key="empty-filter-option"
-              disabled value="default"> -- select -- </option>)
+            const filterOptions = [{key: "", label: "all"}];
             for (let i = 0; i < l; i+=1) {
               const filterOption = data[i][filterCol];
               if (!flags[filterOption]) {
                 flags[filterOption] = true;
-                filterOptions.push(
-                  <option key={`filteroption-${i}`} value={filterOption}>{filterOption}</option>);
+                filterOptions.push(filterOption);
               }
             }
-            return (<select name="filterKeyworld" defaultValue="default" onChange={changeFilterKeyword} >
-              {filterOptions}
-            </select>);
+            return <Dropdown options={filterOptions} onChange={col => changeFilterKeyword(col.key)} />;
           }
           default:
-            return <input type="text" id="filterKeyword" onChange={changeFilterKeyword} />;
+            return <input type="text" id="filterKeyword" onChange={e => changeFilterKeyword(e.target.value)} />;
         }
       };
       return (
         <div className="filter">
           <label htmlFor="filterCol">Filter:</label>
-          <select name="filterCol" onChange={changeFilterCol}>
-            {options}
-          </select>
+          <Dropdown options={options} onChange={col => changeFilterCol(col)} />
           <label htmlFor="filterKeyword">Keyword:</label>
           { generateFilterKeyword() }
         </div>
@@ -339,18 +331,18 @@ export default class Table extends Component {
 }
 
 Table.propTypes = {
-  def: React.PropTypes.arrayOf(
-    React.PropTypes.shape({
-      key: React.PropTypes.string.isRequired,
-      label: React.PropTypes.string.isRequired,
-      sortable: React.PropTypes.bool,
-      onSort: React.PropTypes.function,
-      renderer: React.PropTypes.function,
+  def: PropTypes.arrayOf(
+    PropTypes.shape({
+      key: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
+      sortable: PropTypes.bool,
+      onSort: PropTypes.function,
+      renderer: PropTypes.function,
     })).isRequired,
-  data: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
-  filterable: React.PropTypes.bool,
-  pagination: React.PropTypes.bool,
-  pageSize: React.PropTypes.number,
+  data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  filterable: PropTypes.bool,
+  pagination: PropTypes.bool,
+  pageSize: PropTypes.number,
 };
 
 Table.defaultProps = {
