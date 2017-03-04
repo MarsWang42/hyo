@@ -204,7 +204,7 @@ export default class Table extends Component {
                 const filterOption = data[i][filter.key];
                 if (!flags[filterOption]) {
                   flags[filterOption] = true;
-                  filterOptions.push(filterOption);
+                  filterOptions.push({ key: filterOption, label: filterOption });
                 }
               }
               return (<Dropdown

@@ -6,12 +6,12 @@ export default class Dropdown extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      options: props.options,
       selected: {
         label: props.placeholder || "Select",
         key: '',
       },
       isOpen: false,
+      filter: "",
     };
     this.mounted = true;
     this.triggerChangeEvent = this.triggerChangeEvent.bind(this);
@@ -19,6 +19,7 @@ export default class Dropdown extends Component {
     this.setValue = this.setValue.bind(this);
     this.onRemove = this.onRemove.bind(this);
     this.hideDropdown = this.hideDropdown.bind(this);
+    this.changeFilter = this.changeFilter.bind(this);
   }
 
   /*
@@ -91,16 +92,16 @@ export default class Dropdown extends Component {
     }
   }
 
-  changeFilter(filter) {
-
+  changeFilter(event) {
+    this.setState({ filter: event.target.value });
   }
 
   /*
    * build Menu generate the dropdown menu
    */
   buildMenu() {
-    const { filterable } = this.props;
-    const { options } = this.state;
+    const { options, filterable } = this.props;
+    const { filter } = this.state;
     const ops = [];
     const renderFilter = () => (
       <div className="Dropdown-filter" key="dropdown-filter">
@@ -108,12 +109,14 @@ export default class Dropdown extends Component {
         <span className="search-btn" />
       </div>
     );
+    // if the menu is filterable, only show the options being filtered.
     if (filterable) ops.push(renderFilter());
-    if (options.length) ops.push(
-      options.filter(option =>
-          option.toString().toLowerCase().includes(option.toLowerCase()))
-        .map(option => this.renderOption(option)));
-    else ops.push(<div className="Dropdown-noresults">No options found</div>);
+    const shownOptions = options.filter(option =>
+        option.key.toString().toLowerCase().includes(filter.toLowerCase()))
+      .map(option => this.renderOption(option));
+
+    if (shownOptions.length) ops.push(shownOptions);
+    else ops.push(<div className="Dropdown-noresults" key="dropdown-noresult">No options found</div>);
 
     return ops;
   }
@@ -126,13 +129,12 @@ export default class Dropdown extends Component {
       'Dropdown-option': true,
       'is-selected': option === this.state.selected,
     });
-
-    const key = option.key !== undefined ? option.key : option.label || option;
-    const label = option.label !== undefined? option.label : option.key || option;
+    const key = option.key;
+    const label = option.label;
 
     return (
       <div
-        key={`${key}-add-filter`}
+        key={`${key}-dropdown`}
         className={optionClass}
         onMouseDown={() => this.setValue(key, label)}
         onClick={() => this.setValue(key, label)}
@@ -143,7 +145,7 @@ export default class Dropdown extends Component {
   }
 
   render() {
-    const { disabled, remove, shownText, filterable } = this.props;
+    const { disabled, remove, shownText } = this.props;
     const { selected, isOpen } = this.state;
     const removeClass = remove? 'Dropdown-remove' : '';
     const disabledClass = disabled ? 'Dropdown-disabled' : '';
