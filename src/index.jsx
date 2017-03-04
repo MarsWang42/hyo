@@ -26,7 +26,6 @@ export default class Table extends Component {
    */
   initializeStates() {
     const {
-      def,
       data,
       pageSize,
       pagination,
@@ -96,7 +95,7 @@ export default class Table extends Component {
       // and update the sorted Rows
       if (filtering && filterable) {
         let filteredRows = [...data];
-        for (let i = 0, length = newFilters.length; i < length; i++) {
+        for (let i = 0, length = newFilters.length; i < length; i+=1) {
           // Use the side effect of sort method.
           filteredRows = filteredRows.filter((row) => {
             const keyword = newFilters[i].keyword;
@@ -159,7 +158,7 @@ export default class Table extends Component {
     };
 
     const updateFilter = (col, keyword) => {
-      let newFilters = [...filters];
+      const newFilters = [...filters];
       const updatedFilter = newFilters.find(filter => filter.key === col);
       updatedFilter.keyword = keyword;
       updateRows(sortingCol, sortingDirection, newFilters, currentPage, true);
@@ -212,7 +211,7 @@ export default class Table extends Component {
                 key={`${filter.key}-filter`}
                 onChange={col => updateFilter(filter.key, col.key)}
                 remove
-                onRemove={()=> removeFilter(filter.key)}
+                onRemove={() => removeFilter(filter.key)}
                 filterable
                 placeholder={`${filter.label} Filter`}
               />);

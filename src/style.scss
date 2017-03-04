@@ -1,6 +1,151 @@
 $breakpoint-alpha: 480px;
 @import url('http://fonts.googleapis.com/css?family=Montserrat:300,400,700');
 
+/*
+ * Dropdown Button Style
+ */
+.Dropdown-root {
+  position: relative;
+  font-family: Montserrat, sans-serif;
+  font-size:14px;
+  margin: 5px 15px;
+}
+
+.Dropdown-control {
+  position: relative;
+  overflow: hidden;
+  background-color: rgba(0,0,0,0.02);
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  box-sizing: border-box;
+  color: #333;
+  cursor: default;
+  outline: none;
+  padding: 8px 52px 8px 10px;
+  transition: all 200ms ease;
+}
+
+.Dropdown-remove {
+  padding: 8px 52px 8px 34px;
+  .remove-btn {
+    position: absolute;
+    left: 10px;
+    top: 11px;
+    display: inline-block;
+    cursor: pointer;
+    background-image: url('/delete_picker.svg');
+    width: 15px;
+    height: 15px;
+    min-width: 15px;
+    min-height: 15px;
+    background-size: 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+  }
+}
+
+.Dropdown-control:hover {
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+}
+
+.Dropdown-arrow {
+  border-color: #999 transparent transparent;
+  border-style: solid;
+  border-width: 5px 5px 0;
+  content: ' ';
+  display: block;
+  height: 0;
+  margin-top: -ceil(2.5);
+  position: absolute;
+  right: 10px;
+  top: 14px;
+  width: 0
+}
+
+.is-open .Dropdown-arrow {
+  border-color: transparent transparent #999;
+  border-width: 0 5px 5px;
+}
+
+.Dropdown-menu {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+  margin-top: -1px;
+  max-height: 200px;
+  overflow-y: auto;
+  position: absolute;
+  top: 100%;
+  width: 100%;
+  z-index: 1000;
+  -webkit-overflow-scrolling: touch;
+}
+
+.Dropdown-filter {
+  width: 90%;
+  align-self: center;
+  margin: 5px 0;
+  input {
+    box-sizing: border-box;
+    width: 100%;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding: 5px 30px 5px 5px;
+  }
+  .search-btn {
+    position: absolute;
+    right: 18px;
+    top: 13px;
+    display: inline-block;
+    background-image: url('/active-search.svg');
+    width: 15px;
+    height: 15px;
+    min-width: 15px;
+    min-height: 15px;
+    background-size: 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+  }
+}
+
+.Dropdown-option {
+  box-sizing: border-box;
+  color: rgba(51, 51, 51, 0.8);
+  cursor: pointer;
+  display: block;
+  padding: 8px 10px;
+}
+
+.Dropdown-option:last-child {
+  border-bottom-right-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+
+.Dropdown-option:hover {
+  background-color: #f2f9fc;
+  color: #333;
+}
+
+.Dropdown-option.is-selected {
+  background-color: #f2f9fc;
+  color: #333;
+}
+
+.Dropdown-noresults {
+  box-sizing: border-box;
+  color: #ccc;
+  cursor: default;
+  display: block;
+  padding: 8px 10px;
+}
+
+/*
+ * Hyo Table Button Style
+ */
 .hyo {
   font-family: Montserrat, sans-serif;
   font-size: 16px;
@@ -17,144 +162,6 @@ $breakpoint-alpha: 480px;
     align-items: center;
     flex-wrap: wrap;
     padding: 15px;
-
-    .Dropdown-root {
-      position: relative;
-      font-family: Montserrat, sans-serif;
-      font-size:14px;
-    }
-
-    .Dropdown-control {
-      position: relative;
-      overflow: hidden;
-      background-color: white;
-      border: 1px solid #ccc;
-      border-radius: 2px;
-      box-sizing: border-box;
-      color: #333;
-      cursor: default;
-      outline: none;
-      padding: 8px 52px 8px 10px;
-      transition: all 200ms ease;
-    }
-
-    .Dropdown-remove {
-      padding: 8px 52px 8px 34px;
-      .remove-btn {
-        position: absolute;
-        left: 10px;
-        top: 11px;
-        display: inline-block;
-        cursor: pointer;
-        background-image: url('/delete_picker.svg');
-        width: 15px;
-        height: 15px;
-        min-width: 15px;
-        min-height: 15px;
-        background-size: 100%;
-        background-position: center center;
-        background-repeat: no-repeat;
-      }
-    }
-
-    .Dropdown-control:hover {
-      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
-    }
-
-    .Dropdown-arrow {
-      border-color: #999 transparent transparent;
-      border-style: solid;
-      border-width: 5px 5px 0;
-      content: ' ';
-      display: block;
-      height: 0;
-      margin-top: -ceil(2.5);
-      position: absolute;
-      right: 10px;
-      top: 14px;
-      width: 0
-    }
-
-    .is-open .Dropdown-arrow {
-      border-color: transparent transparent #999;
-      border-width: 0 5px 5px;
-    }
-
-    .Dropdown-menu {
-      display: flex;
-      flex-direction: column;
-      background-color: white;
-      border: 1px solid #ccc;
-      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
-      box-sizing: border-box;
-      margin-top: -1px;
-      max-height: 200px;
-      overflow-y: auto;
-      position: absolute;
-      top: 100%;
-      width: 100%;
-      z-index: 1000;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .Dropdown-filter {
-      width: 90%;
-      align-self: center;
-      margin: 5px 0;
-      input {
-        box-sizing: border-box;
-        width: 100%;
-        font-size: 14px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        padding: 5px 30px 5px 5px;
-      }
-      .search-btn {
-        position: absolute;
-        right: 18px;
-        top: 13px;
-        display: inline-block;
-        background-image: url('/active-search.svg');
-        width: 15px;
-        height: 15px;
-        min-width: 15px;
-        min-height: 15px;
-        background-size: 100%;
-        background-position: center center;
-        background-repeat: no-repeat;
-      }
-    }
-
-    .Dropdown-option {
-      box-sizing: border-box;
-      color: rgba(51, 51, 51, 0.8);
-      cursor: pointer;
-      display: block;
-      padding: 8px 10px;
-    }
-
-    .Dropdown-option:last-child {
-      border-bottom-right-radius: 2px;
-       border-bottom-left-radius: 2px;
-    }
-
-    .Dropdown-option:hover {
-      background-color: #f2f9fc;
-      color: #333;
-    }
-
-    .Dropdown-option.is-selected {
-      background-color: #f2f9fc;
-      color: #333;
-    }
-
-    .Dropdown-noresults {
-      box-sizing: border-box;
-      color: #ccc;
-      cursor: default;
-      display: block;
-      padding: 8px 10px;
-    }
 
     .Dropdown-root, .text-filter{
       margin: 5px 15px;
@@ -180,7 +187,7 @@ $breakpoint-alpha: 480px;
         font-family: Montserrat, sans-serif;
         font-size:14px;
         display:block;
-        background-color: white;
+        background-color: rgba(0,0,0,0.02);
         border: 1px solid #ccc;
         border-radius: 2px;
         box-sizing: border-box;
@@ -306,6 +313,7 @@ $breakpoint-alpha: 480px;
         border: 1px solid #ddd;
         box-shadow: 2px 2px 2px #888888;
         border-radius: .4em;
+        cursor: pointer;
       }
     }
   }
