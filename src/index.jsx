@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import cn from 'classnames';
 import Dropdown from './dropdown';
+import Spinner from './spinner';
 import './style.scss';
 
 export default class Table extends Component {
@@ -18,18 +19,25 @@ export default class Table extends Component {
   }
 
   componentWillMount() {
-    this.initializeStates();
+    this.initializeStates(this.props);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    // Whenever loading status changed, reinitialize everything.
+    if (nextProps.isLoading !== this.props.isLoading) {
+      this.initializeStates(nextProps);
+    }
   }
 
   /**
    * initializeStates initializes the states with given props.
    */
-  initializeStates() {
+  initializeStates(props) {
     const {
       data,
       pageSize,
       pagination,
-    } = this.props;
+    } = props;
 
     const pages = pagination? Math.floor(data.length / pageSize)-1 : 0;
     const pageRows = pagination ? data.slice(0, pageSize) : data;
@@ -59,6 +67,8 @@ export default class Table extends Component {
       data,
       pagination,
       pageSize,
+      isLoading,
+      loader,
     } = this.props;
 
     /**
@@ -218,7 +228,7 @@ export default class Table extends Component {
                 onChange={col => updateFilter(filter.key, col.key)}
                 remove
                 onRemove={() => removeFilter(filter.key)}
-                filterable = { filter.typehead }
+                filterable={filter.typehead}
                 placeholder={`${filter.label} Filter`}
               />);
             }
@@ -337,7 +347,16 @@ export default class Table extends Component {
           </div>));
         return <div className="hyo-tr" key={`hyo-row-${i}`}>{ cell }</div>;
       });
-      return <div className="hyo-tbody">{ rows }</div>;
+      const shownLoader = loader || <Spinner />;
+      return (
+        <div className="hyo-tbody">
+          { isLoading ? (
+            <div className="table-spinner">
+              { shownLoader }
+            </div>
+          ) : rows }
+        </div>
+      );
     };
 
     /**
@@ -350,7 +369,7 @@ export default class Table extends Component {
           <div className="hyo-table">
             { renderHeaders() }
             { renderRows() }
-            { pagination && renderPagination() }
+            { pagination && !isLoading && renderPagination() }
           </div>
         </div>
       );
@@ -374,10 +393,14 @@ Table.propTypes = {
   filterable: PropTypes.bool,
   pagination: PropTypes.bool,
   pageSize: PropTypes.number,
+  isLoading: PropTypes.bool,
+  loader: PropTypes.element,
 };
 
 Table.defaultProps = {
   filterable: false,
   pagination: false,
   pageSize: 0,
+  isLoading: false,
+  loader: undefined,
 };
