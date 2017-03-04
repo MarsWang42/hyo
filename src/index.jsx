@@ -120,7 +120,7 @@ export default class Table extends Component {
       if (pagination) {
         const startRow = pageSize * (newCurrentPage - 1);
         const endRow = Math.min(newResolvedRows.length, startRow + pageSize);
-        newPages = Math.floor(newResolvedRows.length / pageSize)-1;
+        newPages = Math.ceil(newResolvedRows.length / pageSize)-1;
         updatedRows = newResolvedRows.slice(startRow, endRow);
       } else updatedRows = newResolvedRows;
 
