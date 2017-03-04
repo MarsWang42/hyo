@@ -19,6 +19,7 @@ const def = [
     label: "Gender",
     filterable: true,
     filterType: "select",
+    filterTypehead: true,
   },
   {
     key: "age",

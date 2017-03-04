@@ -145,9 +145,15 @@ export default class Table extends Component {
     };
 
     const addFilter = (filter) => {
-      const type = def.find(col => col.key === filter.key).filterType;
+      const filterCol = def.find(col => col.key === filter.key);
       const newFilters = [...filters];
-      newFilters.push({ key: filter.key, keyword: "", filterType: type, label: filter.label });
+      newFilters.push({
+        key: filter.key,
+        keyword: "",
+        filterType: filterCol.filterType,
+        label: filter.label,
+        typehead: filterCol.filterTypehead,
+      });
       updateRows(sortingCol, sortingDirection, newFilters, currentPage, true);
     };
 
@@ -212,7 +218,7 @@ export default class Table extends Component {
                 onChange={col => updateFilter(filter.key, col.key)}
                 remove
                 onRemove={() => removeFilter(filter.key)}
-                filterable
+                filterable = { filter.typehead }
                 placeholder={`${filter.label} Filter`}
               />);
             }
