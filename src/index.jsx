@@ -113,9 +113,10 @@ export default class Table extends Component {
     // If Pagination, slice the resolved the data within current page.
     let newPages = 0;
     if (pagination) {
+      newPages = Math.ceil(newResolvedRows.length / pageSize)-1;
+      newCurrentPage = Math.min(newCurrentPage, newPages+1);
       const startRow = pageSize * (newCurrentPage - 1);
       const endRow = Math.min(newResolvedRows.length, startRow + pageSize);
-      newPages = Math.ceil(newResolvedRows.length / pageSize)-1;
       updatedRows = newResolvedRows.slice(startRow, endRow);
     } else updatedRows = newResolvedRows;
 
@@ -188,7 +189,7 @@ export default class Table extends Component {
     };
 
     const changePage = (index) => {
-      this.updateRows(data, sortingCol, sortingDirection, filters, index);
+      this.updateRows(resolvedRows, sortingCol, sortingDirection, filters, index);
     };
 
     /**
