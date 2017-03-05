@@ -113,7 +113,8 @@ export default class Table extends Component {
     // If Pagination, slice the resolved the data within current page.
     let newPages = 0;
     if (pagination) {
-      newPages = Math.ceil(newResolvedRows.length / pageSize)-1;
+      newPages = newResolvedRows.length === 0 ? 0
+        : Math.ceil(newResolvedRows.length / pageSize)-1;
       newCurrentPage = Math.min(newCurrentPage, newPages+1);
       const startRow = pageSize * (newCurrentPage - 1);
       const endRow = Math.min(newResolvedRows.length, startRow + pageSize);
