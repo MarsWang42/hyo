@@ -9,7 +9,7 @@
   "scripts": {
     "storybook": "start-storybook -p 9001 -c .storybook -s src/assets",
     "dev": "WEBPACK_ENV=build ./node_modules/.bin/webpack -d",
-    "build": "WEBPACK_ENV=build ./node_modules/.bin/webpack --progress --colors"
+    "build": "WEBPACK_ENV=build ./node_modules/.bin/webpack --progress --colors && sass src/style.scss:build/style.min.css --style compressed && rm -rf .sass-cache"
   },
   "dependencies": {
     "@kadira/storybook": "^2.35.3",

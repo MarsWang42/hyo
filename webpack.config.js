@@ -46,6 +46,7 @@ var config = {
   externals: {
     "react": "React",
     "react-dom": "ReactDOM",
+    "classnames": "classnames",
   },
   plugins: plugins,
 };

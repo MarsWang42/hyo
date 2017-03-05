@@ -3,7 +3,6 @@ import cn from 'classnames';
 import Dropdown from './dropdown';
 import InlineEdit from './inlineEdit';
 import Spinner from './spinner';
-import './style.scss';
 
 export default class Table extends Component {
   constructor() {
