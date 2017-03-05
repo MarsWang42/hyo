@@ -334,6 +334,14 @@ export default class Table extends Component {
       return <div className="hyo-thead"><div className="hyo-tr">{headers}</div></div>;
     };
 
+    const renderRowCell = (row, col, rowId) => {
+      return (
+        <div className="hyo-td" key={`hyo-cell-${col.key}-${rowId}`}>
+          { col.renderer? col.renderer(row[col.key]) : row[col.key] }
+        </div>
+      );
+    };
+
     /**
      * renderRows returns each row according to data.
      */
@@ -341,10 +349,7 @@ export default class Table extends Component {
       let i = 0;
       const rows = pageRows.map((row) => {
         i+=1;
-        const cell = def.map(col =>
-          (<div className="hyo-td" key={`hyo-cell-${col.key}-${i}`}>
-            { col.renderer? col.renderer(row[col.key]) : row[col.key] }
-          </div>));
+        const cell = def.map(col => renderRowCell(row, col, i));
         return <div className="hyo-tr" key={`hyo-row-${i}`}>{ cell }</div>;
       });
       const shownLoader = loader || <Spinner />;

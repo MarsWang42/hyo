@@ -14,12 +14,7 @@ export default class Dropdown extends Component {
       filter: "",
     };
     this.mounted = true;
-    this.triggerChangeEvent = this.triggerChangeEvent.bind(this);
-    this.handleMouseDown = this.handleMouseDown.bind(this);
-    this.setValue = this.setValue.bind(this);
-    this.onRemove = this.onRemove.bind(this);
     this.hideDropdown = this.hideDropdown.bind(this);
-    this.changeFilter = this.changeFilter.bind(this);
   }
 
   /*
@@ -37,21 +32,6 @@ export default class Dropdown extends Component {
   }
 
   /*
-   * setValue reset the current chosen value in state and close the dropdown.
-   */
-  setValue(key, label) {
-    const newState = {
-      selected: {
-        key,
-        label,
-      },
-      isOpen: false,
-    };
-    this.triggerChangeEvent(newState);
-    this.setState(newState);
-  }
-
-  /*
    * handle onBlur situation
    */
   hideDropdown(event) {
@@ -62,112 +42,135 @@ export default class Dropdown extends Component {
     }
   }
 
-  /*
-   * handleMouseDown toggles the dropdown.
-   */
-  handleMouseDown(event) {
-    if (event.type === 'mousedown' && event.button !== 0) return;
-    event.stopPropagation();
-    event.preventDefault();
-
-    this.setState({
-      isOpen: !this.state.isOpen,
-    });
-  }
-
-  onRemove(event) {
-    if (event.type === 'mousedown' && event.button !== 0) return;
-    event.preventDefault();
-    event.stopPropagation();
-    this.props.onRemove();
-    return false
-  }
-
-  /*
-   * trigger the onchange method from props if given
-   */
-  triggerChangeEvent(newState) {
-    if (newState.selected !== this.state.selected && this.props.onChange) {
-      this.props.onChange(newState.selected);
-    }
-  }
-
-  changeFilter(event) {
-    this.setState({ filter: event.target.value });
-  }
-
-  /*
-   * build Menu generate the dropdown menu
-   */
-  buildMenu() {
-    const { options, filterable } = this.props;
-    const { filter } = this.state;
-    const ops = [];
-    const renderFilter = () => (
-      <div className="Dropdown-filter" key="dropdown-filter">
-        <input type="text" onChange={this.changeFilter} />
-        <span className="search-btn" />
-      </div>
-    );
-    // if the menu is filterable, only show the options being filtered.
-    if (filterable) ops.push(renderFilter());
-    const shownOptions = options.filter(option =>
-        option.key.toString().toLowerCase().includes(filter.toLowerCase()))
-      .map(option => this.renderOption(option));
-
-    if (shownOptions.length) ops.push(shownOptions);
-    else ops.push(<div className="Dropdown-noresults" key="dropdown-noresult">No options found</div>);
-
-    return ops;
-  }
-
-  /*
-   * rederOption read the options from props and feed it to buildMenu
-   */
-  renderOption(option) {
-    const optionClass = cn({
-      'Dropdown-option': true,
-      'is-selected': option === this.state.selected,
-    });
-    const key = option.key;
-    const label = option.label;
-
-    return (
-      <div
-        key={`${key}-dropdown`}
-        className={optionClass}
-        onMouseDown={() => this.setValue(key, label)}
-        onClick={() => this.setValue(key, label)}
-      >
-        {label}
-      </div>
-    );
-  }
-
   render() {
-    const { disabled, remove, shownText } = this.props;
-    const { selected, isOpen } = this.state;
-    const removeClass = remove? 'Dropdown-remove' : '';
-    const disabledClass = disabled ? 'Dropdown-disabled' : '';
-    const placeHolderValue = typeof selected === 'string' ? selected : selected.label;
-    const key = (<div className="Dropdown-placeholder">{shownText || placeHolderValue}</div>);
-    const menu = isOpen ? <div className="Dropdown-menu">{this.buildMenu()}</div> : null;
+    const {
+      disabled,
+      remove,
+      shownText,
+      options,
+      filterable,
+      onRemove,
+    } = this.props;
+    const {
+      selected,
+      isOpen,
+      filter,
+    } = this.state;
+
+    /*
+     * trigger the onchange method from props if given
+     */
+    const triggerChangeEvent = (newState) => {
+      if (newState.selected !== this.state.selected && this.props.onChange) {
+        this.props.onChange(newState.selected);
+      }
+    };
+
+    /*
+     * setValue reset the current chosen value in state and close the dropdown.
+     */
+    const setValue = (key, label) => {
+      const newState = {
+        selected: {
+          key,
+          label,
+        },
+        isOpen: false,
+      };
+      triggerChangeEvent(newState);
+      this.setState(newState);
+    };
+
+    /*
+     * handleMouseDown toggles the dropdown.
+     */
+    const handleMouseDown = (event) => {
+      if (event.type === 'mousedown' && event.button !== 0) return;
+      event.stopPropagation();
+      event.preventDefault();
+
+      this.setState({
+        isOpen: !isOpen,
+      });
+    };
+
+    const removeDropdown = (event) => {
+      if (event.type === 'mousedown' && event.button !== 0) return;
+      event.preventDefault();
+      event.stopPropagation();
+      onRemove();
+    };
+
+    const changeFilter = (event) => {
+      this.setState({ filter: event.target.value });
+    };
+
+    /*
+     * rederOption read the options from props and feed it to buildMenu
+     */
+    const renderOption = (option) => {
+      const optionClass = cn({
+        'Dropdown-option': true,
+        'is-selected': option === this.state.selected,
+      });
+      const key = option.key;
+      const label = option.label;
+
+      return (
+        <div
+          key={`${key}-dropdown`}
+          className={optionClass}
+          onMouseDown={() => setValue(key, label)}
+          onClick={() => setValue(key, label)}
+        >
+          {option.label}
+        </div>
+      );
+    };
+
+    /*
+     * build Menu generate the dropdown menu
+     */
+    const buildMenu = () => {
+      const ops = [];
+      const renderFilter = () => (
+        <div className="Dropdown-filter" key="dropdown-filter">
+          <input type="text" onChange={changeFilter} />
+          <span className="search-btn" />
+        </div>
+      );
+      // if the menu is filterable, only show the options being filtered.
+      if (filterable) ops.push(renderFilter());
+      const shownOptions = options.filter(option =>
+          option.key.toString().toLowerCase().includes(filter.toLowerCase()))
+        .map(option => renderOption(option));
+
+      if (shownOptions.length) ops.push(shownOptions);
+      else ops.push(<div className="Dropdown-noresults" key="dropdown-noresult">No options found</div>);
+
+      return ops;
+    };
 
     const dropdownClass = cn({
       'Dropdown-root': true,
       'is-open': isOpen,
     });
+    const menu = isOpen ? <div className="Dropdown-menu">{buildMenu()}</div> : null;
+    const removeClass = remove? 'Dropdown-remove' : '';
+    const disabledClass = disabled ? 'Dropdown-disabled' : '';
+    const placeHolderValue = typeof selected === 'string' ? selected : selected.label;
+    const content = (<div className="Dropdown-placeholder">{shownText || placeHolderValue}</div>);
 
     return (
       <div className={dropdownClass}>
         <div
           className={`Dropdown-control ${disabledClass} ${removeClass}`}
-          onMouseDown={this.handleMouseDown}
-          onTouchEnd={this.handleMouseDown}
+          onMouseDown={handleMouseDown}
+          onTouchEnd={handleMouseDown}
         >
-          {key}
+          {content}
           <span className="Dropdown-arrow" />
-          {remove && <span className="remove-btn" onMouseDown={this.onRemove} onTouchEnd={this.onRemove}/>}
+          {remove && <span className="remove-btn" onMouseDown={removeDropdown} onTouchEnd={removeDropdown} />}
         </div>
         {menu}
       </div>
@@ -189,6 +192,8 @@ Dropdown.propTypes = {
   onChange: PropTypes.func,
   remove: PropTypes.bool,
   shownText: PropTypes.string,
+  filterable: PropTypes.bool,
+  onRemove: PropTypes.func,
 };
 
 Dropdown.defaultProps = {
@@ -197,4 +202,6 @@ Dropdown.defaultProps = {
   onChange: undefined,
   remove: false,
   shownText: "",
+  filterable: false,
+  onRemove: undefined,
 };

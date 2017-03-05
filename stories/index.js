@@ -4,6 +4,7 @@ import SortableTable from './sortableTable';
 import FilterableTable from './filterableTable';
 import BigTable from './bigTable';
 import PaginationTable from './paginationTable';
+import EditableTable from './editableTable';
 
 
 storiesOf('Hyo Tables', module)
@@ -11,4 +12,5 @@ storiesOf('Hyo Tables', module)
   .add('Sortable Table', SortableTable)
   .add('Filterable Table', FilterableTable)
   .add('5k lines Table', BigTable)
-  .add('Pagination Table', PaginationTable);
+  .add('Pagination Table', PaginationTable)
+  .add('Editable Table', EditableTable);
