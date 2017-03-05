@@ -65,15 +65,11 @@ export default class Table extends Component {
     sorting,
   ) {
     const {
-      resolvedRows,
-    } = this.state;
-
-    const {
       filterable,
       pagination,
       pageSize,
     } = this.props;
-    let newResolvedRows = resolvedRows;
+    let newResolvedRows = data;
     let updatedRows;
 
     if (sorting && newSortingCol.sortable) {
@@ -113,27 +109,27 @@ export default class Table extends Component {
         });
       }
       newResolvedRows = filteredRows;
-
-      // If Pagination, slice the resolved the data within current page.
-      let newPages = 0;
-      if (pagination) {
-        const startRow = pageSize * (newCurrentPage - 1);
-        const endRow = Math.min(newResolvedRows.length, startRow + pageSize);
-        newPages = Math.ceil(newResolvedRows.length / pageSize)-1;
-        updatedRows = newResolvedRows.slice(startRow, endRow);
-      } else updatedRows = newResolvedRows;
-
-      this.setState({
-        pageRows: updatedRows,
-        filters: newFilters,
-        sortingCol: newSortingCol,
-        sortingDirection: newSortingDirection,
-        currentPage: newCurrentPage,
-        navigatorPage: newCurrentPage,
-        resolvedRows: newResolvedRows,
-        pages: newPages,
-      });
     }
+
+    // If Pagination, slice the resolved the data within current page.
+    let newPages = 0;
+    if (pagination) {
+      const startRow = pageSize * (newCurrentPage - 1);
+      const endRow = Math.min(newResolvedRows.length, startRow + pageSize);
+      newPages = Math.ceil(newResolvedRows.length / pageSize)-1;
+      updatedRows = newResolvedRows.slice(startRow, endRow);
+    } else updatedRows = newResolvedRows;
+
+    this.setState({
+      pageRows: updatedRows,
+      filters: newFilters,
+      sortingCol: newSortingCol,
+      sortingDirection: newSortingDirection,
+      currentPage: newCurrentPage,
+      navigatorPage: newCurrentPage,
+      resolvedRows: newResolvedRows,
+      pages: newPages,
+    });
   }
 
   render() {
