@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import cn from 'classnames';
 import Dropdown from './dropdown';
+import InlineEdit from './inlineEdit';
 import Spinner from './spinner';
 import './style.scss';
 
@@ -334,10 +335,25 @@ export default class Table extends Component {
       return <div className="hyo-thead"><div className="hyo-tr">{headers}</div></div>;
     };
 
+    /**
+     * renderRowCell returns each cell in a row.
+     */
     const renderRowCell = (row, col, rowId) => {
+      let Cell;
+      if (col.editable) {
+        Cell = (<InlineEdit
+          renderer={col.renderer}
+          // TODO: be more cautious
+          value={row[col.key].toString()}
+          onChange={(value) => {
+            if (col.onEdit) col.onEdit(row, col.key, (pageSize*(currentPage-1))+rowId, value);
+          }
+          }
+        />);
+      } else Cell = col.renderer ? col.renderer(row[col.key]) : row[col.key];
       return (
         <div className="hyo-td" key={`hyo-cell-${col.key}-${rowId}`}>
-          { col.renderer? col.renderer(row[col.key]) : row[col.key] }
+          { Cell }
         </div>
       );
     };
@@ -348,8 +364,8 @@ export default class Table extends Component {
     const renderRows = () => {
       let i = 0;
       const rows = pageRows.map((row) => {
-        i+=1;
         const cell = def.map(col => renderRowCell(row, col, i));
+        i+=1;
         return <div className="hyo-tr" key={`hyo-row-${i}`}>{ cell }</div>;
       });
       const shownLoader = loader || <Spinner />;

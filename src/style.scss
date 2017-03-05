@@ -144,9 +144,23 @@ $breakpoint-alpha: 480px;
 }
 
 /*
- * Spinner Style
+ * Inline Edit Style
  */
 
+.inline-edit-text {
+  cursor: pointer;
+}
+.inline-edit-input {
+  box-sizing: border-box;
+  width: 100%;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/*
+ * Spinner Style
+ */
 
 $loader-blue: #3498db;
 $loader-orange: #e74c3c;
