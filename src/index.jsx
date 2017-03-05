@@ -26,7 +26,8 @@ export default class Table extends Component {
   componentWillReceiveProps(nextProps) {
     // Whenever loading status changed, reinitialize everything.
     if (nextProps.isLoading !== this.props.isLoading) {
-      this.initializeStates(nextProps);
+      const { sortingCol, sortingDirection, filters, currentPage } = this.state;
+      this.updateRows(nextProps.data, sortingCol, sortingDirection, filters, currentPage, true, true);
     }
   }
 
@@ -48,6 +49,91 @@ export default class Table extends Component {
       resolvedRows: data,
       pages,
     });
+  }
+
+  /**
+   * updateRows is a method to all of the rows
+   * being rendered as the body of table.
+   */
+  updateRows(
+    data,
+    newSortingCol,
+    newSortingDirection,
+    newFilters,
+    newCurrentPage,
+    filtering,
+    sorting,
+  ) {
+    const {
+      resolvedRows,
+    } = this.state;
+
+    const {
+      filterable,
+      pagination,
+      pageSize,
+    } = this.props;
+    let newResolvedRows = resolvedRows;
+    let updatedRows;
+
+    if (sorting && newSortingCol.sortable) {
+    // Figure out the current direction.
+    // If column is not select, then set direction to be asc.
+    // If it is already selected, set to be the opposite direction.
+      newResolvedRows = data.sort((a, b) => {
+        const attr1 = a[newSortingCol.key];
+        const attr2 = b[newSortingCol.key];
+        const defaultOrder = !attr1 ? -1 : !attr2 ? 1 : attr1.toString().localeCompare(attr2);
+        // Here you can load the columns's onSort function if it has.
+        const order = newSortingCol.onSort? newSortingCol.onSort(attr1, attr2) : defaultOrder;
+        return newSortingDirection === 'asc' ? order : -order;
+      });
+    }
+
+    // Take two params, Col and Keyword.
+    // Filter the data according to the parms
+    // and update the sorted Rows
+    if (filtering && filterable) {
+      let filteredRows = [...data];
+      for (let i = 0, length = newFilters.length; i < length; i+=1) {
+        // Use the side effect of sort method.
+        filteredRows = filteredRows.filter((row) => {
+          const keyword = newFilters[i].keyword;
+          const cell = row[newFilters[i].key];
+          switch (newFilters[i].filterType) {
+            case 'input':
+              return cell.toString().toLowerCase().includes(keyword.toLowerCase());
+            case 'select':
+              // If it is a select filter, must match the whole keyword
+              if (keyword === "") return true;
+              else return cell.toString() === keyword;
+            default:
+              return cell.toString().toLowerCase().includes(keyword.toLowerCase());
+          }
+        });
+      }
+      newResolvedRows = filteredRows;
+
+      // If Pagination, slice the resolved the data within current page.
+      let newPages = 0;
+      if (pagination) {
+        const startRow = pageSize * (newCurrentPage - 1);
+        const endRow = Math.min(newResolvedRows.length, startRow + pageSize);
+        newPages = Math.ceil(newResolvedRows.length / pageSize)-1;
+        updatedRows = newResolvedRows.slice(startRow, endRow);
+      } else updatedRows = newResolvedRows;
+
+      this.setState({
+        pageRows: updatedRows,
+        filters: newFilters,
+        sortingCol: newSortingCol,
+        sortingDirection: newSortingDirection,
+        currentPage: newCurrentPage,
+        navigatorPage: newCurrentPage,
+        resolvedRows: newResolvedRows,
+        pages: newPages,
+      });
+    }
   }
 
   render() {
@@ -72,86 +158,11 @@ export default class Table extends Component {
       loader,
     } = this.props;
 
-    /**
-     * updateRows is a method to all of the rows
-     * being rendered as the body of table.
-     */
-    const updateRows = (
-      newSortingCol = sortingCol,
-      newSortingDirection = sortingDirection,
-      newFilters = filters,
-      newCurrentPage = currentPage,
-      filtering = false,
-      sorting = false,
-    ) => {
-      let newResolvedRows = resolvedRows;
-      let updatedRows;
-
-      if (sorting && newSortingCol.sortable) {
-      // Figure out the current direction.
-      // If column is not select, then set direction to be asc.
-      // If it is already selected, set to be the opposite direction.
-        newResolvedRows = data.sort((a, b) => {
-          const attr1 = a[newSortingCol.key];
-          const attr2 = b[newSortingCol.key];
-          const defaultOrder = !attr1 ? -1 : !attr2 ? 1 : attr1.toString().localeCompare(attr2);
-          // Here you can load the columns's onSort function if it has.
-          const order = newSortingCol.onSort? newSortingCol.onSort(attr1, attr2) : defaultOrder;
-          return newSortingDirection === 'asc' ? order : -order;
-        });
-      }
-
-      // Take two params, Col and Keyword.
-      // Filter the data according to the parms
-      // and update the sorted Rows
-      if (filtering && filterable) {
-        let filteredRows = [...data];
-        for (let i = 0, length = newFilters.length; i < length; i+=1) {
-          // Use the side effect of sort method.
-          filteredRows = filteredRows.filter((row) => {
-            const keyword = newFilters[i].keyword;
-            const cell = row[newFilters[i].key];
-            switch (newFilters[i].filterType) {
-              case 'input':
-                return cell.toString().toLowerCase().includes(keyword.toLowerCase());
-              case 'select':
-                // If it is a select filter, must match the whole keyword
-                if (keyword === "") return true;
-                else return cell.toString() === keyword;
-              default:
-                return cell.toString().toLowerCase().includes(keyword.toLowerCase());
-            }
-          });
-        }
-        newResolvedRows = filteredRows;
-      }
-
-      // If Pagination, slice the resolved the data within current page.
-      let newPages = 0;
-      if (pagination) {
-        const startRow = pageSize * (newCurrentPage - 1);
-        const endRow = Math.min(newResolvedRows.length, startRow + pageSize);
-        newPages = Math.ceil(newResolvedRows.length / pageSize)-1;
-        updatedRows = newResolvedRows.slice(startRow, endRow);
-      } else updatedRows = newResolvedRows;
-
-      this.setState({
-        pageRows: updatedRows,
-        filters: newFilters,
-        sortingCol: newSortingCol,
-        sortingDirection: newSortingDirection,
-        currentPage: newCurrentPage,
-        navigatorPage: newCurrentPage,
-        resolvedRows: newResolvedRows,
-        pages: newPages,
-      });
-    };
-
     const sortColumn = (col) => {
       if (col.sortable) {
         const dr = col.key !== sortingCol.key ? 'asc' :
           sortingDirection === 'asc' ? 'desc' : 'asc';
-        updateRows(col, dr, filters, currentPage, true, true);
+        this.updateRows(data, col, dr, filters, currentPage, true, true);
       }
     };
 
@@ -165,24 +176,24 @@ export default class Table extends Component {
         label: filter.label,
         typehead: filterCol.filterTypehead,
       });
-      updateRows(sortingCol, sortingDirection, newFilters, currentPage, true);
+      this.updateRows(data, sortingCol, sortingDirection, newFilters, currentPage, true);
     };
 
     const removeFilter = (col) => {
       let newFilters = [...filters];
       newFilters = newFilters.filter(filter => filter.key !== col);
-      updateRows(sortingCol, sortingDirection, newFilters, currentPage, true);
+      this.updateRows(data, sortingCol, sortingDirection, newFilters, currentPage, true);
     };
 
     const updateFilter = (col, keyword) => {
       const newFilters = [...filters];
       const updatedFilter = newFilters.find(filter => filter.key === col);
       updatedFilter.keyword = keyword;
-      updateRows(sortingCol, sortingDirection, newFilters, currentPage, true);
+      this.updateRows(data, sortingCol, sortingDirection, newFilters, currentPage, true);
     };
 
     const changePage = (index) => {
-      updateRows(sortingCol, sortingDirection, filters, index);
+      this.updateRows(data, sortingCol, sortingDirection, filters, index);
     };
 
     /**
