@@ -46,10 +46,11 @@ export default class Dropdown extends Component {
     const {
       disabled,
       remove,
-      shownText,
+      shownContent,
       options,
       filterable,
       onRemove,
+      inline,
     } = this.props;
     const {
       selected,
@@ -152,19 +153,23 @@ export default class Dropdown extends Component {
     };
 
     const dropdownClass = cn({
-      'Dropdown-root': true,
+      'Dropdown-root': !inline,
+      'Dropdown-inline-root': inline,
       'is-open': isOpen,
     });
+    const controlClass = cn({
+      'Dropdown-control': !inline,
+      'Dropdown-disabled': disabled,
+      'Dropdown-remove': remove,
+    })
     const menu = isOpen ? <div className="Dropdown-menu">{buildMenu()}</div> : null;
-    const removeClass = remove? 'Dropdown-remove' : '';
-    const disabledClass = disabled ? 'Dropdown-disabled' : '';
     const placeHolderValue = typeof selected === 'string' ? selected : selected.label;
-    const content = (<div className="Dropdown-placeholder">{shownText || placeHolderValue}</div>);
+    const content = (<div className="Dropdown-placeholder">{shownContent || placeHolderValue}</div>);
 
     return (
       <div className={dropdownClass}>
         <div
-          className={`Dropdown-control ${disabledClass} ${removeClass}`}
+          className={controlClass}
           onMouseDown={handleMouseDown}
           onTouchEnd={handleMouseDown}
         >
@@ -191,7 +196,7 @@ Dropdown.propTypes = {
   disabled: PropTypes.bool,
   onChange: PropTypes.func,
   remove: PropTypes.bool,
-  shownText: PropTypes.string,
+  shownContent: PropTypes.string,
   filterable: PropTypes.bool,
   onRemove: PropTypes.func,
 };
@@ -201,7 +206,7 @@ Dropdown.defaultProps = {
   disabled: false,
   onChange: undefined,
   remove: false,
-  shownText: "",
+  shownContent: "",
   filterable: false,
   onRemove: undefined,
 };

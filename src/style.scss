@@ -6,12 +6,12 @@ $breakpoint-alpha: 480px;
  */
 .Dropdown-root {
   position: relative;
-  font-family: Montserrat, sans-serif;
-  font-size:14px;
   margin: 5px 15px;
 }
 
 .Dropdown-control {
+  font-family: Montserrat, sans-serif;
+  font-size: 14px;
   position: relative;
   overflow: hidden;
   background-color: rgba(0,0,0,0.02);
@@ -19,10 +19,29 @@ $breakpoint-alpha: 480px;
   border-radius: 2px;
   box-sizing: border-box;
   color: #333;
-  cursor: default;
+  cursor: pointer;
   outline: none;
   padding: 8px 52px 8px 10px;
   transition: all 200ms ease;
+
+  .Dropdown-arrow {
+    right: 10px;
+    top: 14px;
+  }
+}
+
+.Dropdown-inline-root {
+  position: relative;
+  cursor: pointer;
+
+  .Dropdown-arrow {
+    right: 10px;
+    top: 8px;
+  }
+
+  .Dropdown-menu {
+    top: 98%;
+  }
 }
 
 .Dropdown-remove {
@@ -57,8 +76,6 @@ $breakpoint-alpha: 480px;
   height: 0;
   margin-top: -ceil(2.5);
   position: absolute;
-  right: 10px;
-  top: 14px;
   width: 0
 }
 
@@ -68,6 +85,8 @@ $breakpoint-alpha: 480px;
 }
 
 .Dropdown-menu {
+  font-family: Montserrat, sans-serif;
+  font-size:14px;
   display: flex;
   flex-direction: column;
   background-color: white;
@@ -85,7 +104,7 @@ $breakpoint-alpha: 480px;
 }
 
 .Dropdown-filter {
-  width: 90%;
+  width: 95%;
   align-self: center;
   margin: 5px 0;
   input {
@@ -98,7 +117,7 @@ $breakpoint-alpha: 480px;
   }
   .search-btn {
     position: absolute;
-    right: 18px;
+    right: 6%;
     top: 13px;
     display: inline-block;
     background-image: url('http://svgshare.com/i/u5.svg');
@@ -290,7 +309,7 @@ $loader-yellow: #f9c922;
     border-radius: .4em;
     border: 1px solid rgba(0,0,0,.1);
     border-collapse: collapse;
-    overflow: auto;
+    overflow-y: visible;
   }
 
   .hyo-thead {
@@ -368,7 +387,7 @@ $loader-yellow: #f9c922;
     white-space: nowrap;
     text-overflow: ellipsis;
     padding: 7px 5px;
-    overflow: hidden;
+    overflow-y: visible;
   }
 
   .hyo-paginate {

@@ -60,6 +60,13 @@ class EditableTable extends Component {
         label: "Gender",
         filterable: true,
         filterType: "select",
+        editable: true,
+        onEdit: updateValue,
+        editType: "select",
+        editOptions: [
+          {key: "Male", label: "Male"},
+          {key: "Femail", label: "Female"},
+        ],
       },
       {
         key: "age",

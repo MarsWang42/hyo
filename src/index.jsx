@@ -248,7 +248,7 @@ export default class Table extends Component {
       };
       return (
         <div className="filter">
-          <Dropdown options={options} onChange={col => addFilter(col)} shownText="Add a filter" />
+          <Dropdown options={options} onChange={col => addFilter(col)} shownContent="Add a filter" />
           { generateFilters() }
         </div>
       );
@@ -357,6 +357,8 @@ export default class Table extends Component {
             if (col.onEdit) col.onEdit(row, col.key, (pageSize*(currentPage-1))+rowId, value);
           }
           }
+          editType={col.editType}
+          editOptions={col.editOptions}
         />);
       } else Cell = col.renderer ? col.renderer(row[col.key]) : row[col.key];
       return (
