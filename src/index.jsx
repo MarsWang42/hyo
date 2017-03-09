@@ -335,12 +335,14 @@ export default class Table extends Component {
           "hyo-th": true,
           "sortable": col.sortable,
         });
+        // if given width
+        const thStyle = col.width ? { width: col.width } : {};
         const spanClassName = cn({
           "sort": col.sortable,
           "sortup": col.sortable && col.key === sortingCol.key && sortingDirection === "asc",
           "sortdown": col.sortable && col.key === sortingCol.key && sortingDirection === "desc",
         });
-        return (<th key={`${col.key}-header`} className={thClassName} onClick={() => sortColumn(col)}>
+        return (<th key={`${col.key}-header`} className={thClassName} style={thStyle} onClick={() => sortColumn(col)}>
           {col.label}<span className={spanClassName} />
         </th>);
       });
