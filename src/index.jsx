@@ -262,63 +262,67 @@ export default class Table extends Component {
       const startRow = (pageSize * (currentPage-1)) + 1;
       const endRow = Math.min(totalRows, (startRow + pageSize) - 1);
       return (
-        <div className="hyo-paginate">
-          <div>Showing {startRow} to {endRow} of {totalRows} entries</div>
-          <div className="navigator" >
-            <button
-              type="button"
-              disabled={currentPage === 1}
-              onClick={() => changePage(1)}
-            >
-              &lt;&lt;
-            </button>
-            <button
-              type="button"
-              disabled={currentPage === 1}
-              onClick={() => changePage(currentPage-1)}
-            >
-              &lt;
-            </button>
-            <div>
-              Go to Page
-              <input
-                type="text"
-                onKeyDown={(e) => {
-                  if (e.keyCode === 13) {
-                    changePage(e.target.value);
-                  }
-                }}
-                value={navigatorPage}
-                onChange={(e) => {
-                  let page = e.target.value;
-                  if (page === "") this.setState({ navigatorPage: page });
-                  else {
-                    page = Math.min(Math.max(0, e.target.value), pages+1);
-                    this.setState({ navigatorPage: page });
-                  }
-                }}
-                onBlur={(e) => {
-                  changePage(e.target.value);
-                }}
-              />
-              of {pages+1}
+        <tr>
+          <td colSpan={def.length}>
+            <div className="hyo-paginate">
+              <div>Showing {startRow} to {endRow} of {totalRows} entries</div>
+              <div className="navigator" >
+                <button
+                  type="button"
+                  disabled={currentPage === 1}
+                  onClick={() => changePage(1)}
+                >
+                  &lt;&lt;
+                </button>
+                <button
+                  type="button"
+                  disabled={currentPage === 1}
+                  onClick={() => changePage(currentPage-1)}
+                >
+                  &lt;
+                </button>
+                <div>
+                  Go to Page
+                  <input
+                    type="text"
+                    onKeyDown={(e) => {
+                      if (e.keyCode === 13) {
+                        changePage(e.target.value);
+                      }
+                    }}
+                    value={navigatorPage}
+                    onChange={(e) => {
+                      let page = e.target.value;
+                      if (page === "") this.setState({ navigatorPage: page });
+                      else {
+                        page = Math.min(Math.max(0, e.target.value), pages+1);
+                        this.setState({ navigatorPage: page });
+                      }
+                    }}
+                    onBlur={(e) => {
+                      changePage(e.target.value);
+                    }}
+                  />
+                  of {pages+1}
+                </div>
+                <button
+                  type="button"
+                  disabled={currentPage === pages+1}
+                  onClick={() => changePage(currentPage+1)}
+                >
+                  &gt;
+                </button>
+                <button
+                  type="button"
+                  disabled={currentPage === pages+1}
+                  onClick={() => changePage(pages+1)}
+                >
+                  &gt;&gt;
+                </button>
+              </div>
             </div>
-            <button
-              type="button"
-              disabled={currentPage === pages+1}
-              onClick={() => changePage(currentPage+1)}
-            >
-              &gt;
-            </button>
-            <button
-              type="button"
-              disabled={currentPage === pages+1}
-              onClick={() => changePage(pages+1)}
-            >
-              &gt;&gt;
-            </button>
-          </div>
-        </div>
+          </td>
+        </tr>
       );
     };
 
@@ -336,11 +340,11 @@ export default class Table extends Component {
           "sortup": col.sortable && col.key === sortingCol.key && sortingDirection === "asc",
           "sortdown": col.sortable && col.key === sortingCol.key && sortingDirection === "desc",
         });
-        return (<div key={`${col.key}-header`} className={thClassName} onClick={() => sortColumn(col)}>
+        return (<th key={`${col.key}-header`} className={thClassName} onClick={() => sortColumn(col)}>
           {col.label}<span className={spanClassName} />
-        </div>);
+        </th>);
       });
-      return <div className="hyo-thead"><div className="hyo-tr">{headers}</div></div>;
+      return <thead className="hyo-thead"><tr className="hyo-tr">{headers}</tr></thead>;
     };
 
     /**
@@ -362,9 +366,9 @@ export default class Table extends Component {
         />);
       } else Cell = col.renderer ? col.renderer(row[col.key]) : row[col.key];
       return (
-        <div className="hyo-td" key={`hyo-cell-${col.key}-${rowId}`}>
+        <td className="hyo-td" key={`hyo-cell-${col.key}-${rowId}`}>
           { Cell }
-        </div>
+        </td>
       );
     };
 
@@ -376,17 +380,13 @@ export default class Table extends Component {
       const rows = pageRows.map((row) => {
         const cell = def.map(col => renderRowCell(row, col, i));
         i+=1;
-        return <div className="hyo-tr" key={`hyo-row-${i}`}>{ cell }</div>;
+        return <tr className="hyo-tr" key={`hyo-row-${i}`}>{ cell }</tr>;
       });
-      const shownLoader = loader || <Spinner />;
       return (
-        <div className="hyo-tbody">
-          { isLoading ? (
-            <div className="table-spinner">
-              { shownLoader }
-            </div>
-          ) : rows }
-        </div>
+        <tbody className="hyo-tbody">
+          {!isLoading && rows }
+          { pagination && !isLoading && renderPagination() }
+        </tbody>
       );
     };
 
@@ -394,14 +394,19 @@ export default class Table extends Component {
      * renderTable generates the whole table.
      */
     const renderTable = () => {
+      const shownLoader = loader || <Spinner />;
       return (
         <div className="hyo">
           { filterable && renderFilter() }
-          <div className="hyo-table">
+          <table className="hyo-table">
             { renderHeaders() }
             { renderRows() }
-            { pagination && !isLoading && renderPagination() }
-          </div>
+          </table>
+          { isLoading && (
+            <div className="table-spinner">
+              { shownLoader }
+            </div>
+          )}
         </div>
       );
     };

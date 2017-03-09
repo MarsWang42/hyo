@@ -302,28 +302,22 @@ $loader-yellow: #f9c922;
   }
 
   .hyo-table {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
+    border-spacing: 0;
     width: 100%;
     border-radius: .4em;
     border: 1px solid rgba(0,0,0,.1);
-    border-collapse: collapse;
     overflow-y: visible;
   }
 
   .hyo-thead {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
     background: rgba(0,0,0,.03);
     border-bottom: 1px solid rgba(0,0,0,.15);
     box-shadow: 0 2px 15px 0 rgba(0,0,0,.15);
     .hyo-tr {
       text-align: center;
-      display: inline-flex;
 
       .hyo-th {
+        font-weight: normal;
         border-right: 1px solid rgba(0,0,0,.05);
         &.sortable {
           cursor: pointer;
@@ -356,18 +350,9 @@ $loader-yellow: #f9c922;
   }
 
   .hyo-tbody {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-
-    .table-spinner {
-      width: 100%;
-      height: 300px;
-      position: relative;
-    }
 
     .hyo-tr {
-      display: inline-flex;
+      overflow-y: visible;
 
       .hyo-td {
         border-right: 1px solid rgba(0,0,0,.02);
@@ -382,12 +367,18 @@ $loader-yellow: #f9c922;
     }
   }
 
+  .table-spinner {
+    width: 100%;
+    height: 300px;
+    position: relative;
+  }
+
   .hyo-th, .hyo-td {
-    flex: 1 0 0px;
     white-space: nowrap;
     text-overflow: ellipsis;
     padding: 7px 5px;
-    overflow-y: visible;
+    flex-grow: 0;
+    flex-basis: 25%;
   }
 
   .hyo-paginate {
