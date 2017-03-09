@@ -54,7 +54,7 @@ class EditableTable extends Component {
         filterable: true,
         editable: true,
         onEdit: updateValue,
-        width: "125px",
+        width: 125,
       },
       {
         key: "gender",
@@ -68,7 +68,7 @@ class EditableTable extends Component {
           { key: "Male", label: "Male" },
           { key: "Femail", label: "Female" },
         ],
-        width: "125px",
+        width: 125,
       },
       {
         key: "age",
@@ -78,11 +78,13 @@ class EditableTable extends Component {
         sortable: true,
         editable: true,
         onEdit: updateValue,
+        width: 125,
       },
       {
         key: "birthday",
         label: "Birthday",
         renderer: dateRender,
+        width: 125,
       },
     ];
 
@@ -90,6 +92,10 @@ class EditableTable extends Component {
       <Table
         def={def}
         data={this.state.data}
+        rowHeight={45}
+        headerHeight={35}
+        height={500}
+        width={1000}
         filterable
         pagination
         pageSize={10}

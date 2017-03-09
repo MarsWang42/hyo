@@ -246,6 +246,25 @@ $loader-yellow: #f9c922;
 }
 
 /*
+ * Column resizer style.
+ */
+
+.column-resizer {
+  cursor: ew-resize;
+  position: absolute;
+  right: -5px;
+  width: 12px;
+}
+
+.column-resizer-mouse-area {
+  border-right-style: solid;
+  border-right-width: 1px;
+  box-sizing: border-box;
+  position: absolute;
+  z-index: 10;
+}
+
+/*
  * Hyo Table Button Style
  */
 .hyo {
@@ -302,23 +321,29 @@ $loader-yellow: #f9c922;
   }
 
   .hyo-table {
-    border-spacing: 0;
-    width: 100%;
+    position: relative;
+    table-layout: fixed;
     border-radius: .4em;
     border: 1px solid rgba(0,0,0,.1);
-    overflow-y: visible;
+    overflow: scroll;
+    width: 300px;
+    box-sizing: border-box;
   }
 
   .hyo-thead {
-    background: rgba(0,0,0,.03);
+    position: absolute;
+    top: 0;
     border-bottom: 1px solid rgba(0,0,0,.15);
     box-shadow: 0 2px 15px 0 rgba(0,0,0,.15);
     .hyo-tr {
       text-align: center;
 
       .hyo-th {
+        position: absolute;
+        top: 0;
         font-weight: normal;
         border-right: 1px solid rgba(0,0,0,.05);
+        background: rgba(0,0,0,.03);
         &.sortable {
           cursor: pointer;
         }
@@ -350,11 +375,15 @@ $loader-yellow: #f9c922;
   }
 
   .hyo-tbody {
+    position: absolute;
 
     .hyo-tr {
       overflow-y: visible;
+      position: relative;
 
       .hyo-td {
+        position: absolute;
+        top: 0;
         border-right: 1px solid rgba(0,0,0,.02);
         &:last-child {
           border-right:0
@@ -374,11 +403,10 @@ $loader-yellow: #f9c922;
   }
 
   .hyo-th, .hyo-td {
+    box-sizing: border-box;
     white-space: nowrap;
     text-overflow: ellipsis;
     padding: 7px 5px;
-    flex-grow: 0;
-    flex-basis: 25%;
   }
 
   .hyo-paginate {

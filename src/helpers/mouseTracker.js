@@ -27,7 +27,7 @@ const requestAnimationFrame =
 // Works around a rare bug in Safari 6 where the first request is never invoked.
 requestAnimationFrame(function () {});
 
-class MouseMoveTracker {
+class MouseTracker {
   /**
    * onMove is the callback that will be called on every mouse move.
    * onMoveEnd is called on mouse up when movement has ended.
@@ -141,4 +141,4 @@ class MouseMoveTracker {
   }
 }
 
-export default MouseMoveTracker;
+export default MouseTracker;
