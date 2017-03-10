@@ -322,17 +322,26 @@ $loader-yellow: #f9c922;
 
   .hyo-table {
     position: relative;
-    border-radius: .4em;
+    border-top-left-radius: .4em;
+    border-top-right-radius: .4em;
     border: 1px solid rgba(0,0,0,.1);
+    border-bottom: none;
     overflow: auto;
     width: 300px;
     box-sizing: content-box;
   }
 
+  .without-pagination {
+    border: 1px solid rgba(0,0,0,.1);
+    border-radius: .4em;
+  }
+
   .hyo-thead {
     box-sizing: border-box;
-    position: absolute;
+    position: sticky;
     top: 0;
+    z-index: 1;
+    background-color: white;
     border-bottom: 1px solid rgba(0,0,0,.15);
     box-shadow: 0 2px 15px 0 rgba(0,0,0,.15);
     .hyo-tr {
@@ -391,15 +400,9 @@ $loader-yellow: #f9c922;
       }
     }
 
-    .hyo-tr:nth-child(even) {
+    .hyo-tr-highlighted .hyo-td {
       background-color: rgba(0,0,0,.05)
     }
-  }
-
-  .table-spinner {
-    width: 100%;
-    height: 300px;
-    position: relative;
   }
 
   .hyo-th, .hyo-td {
@@ -410,38 +413,45 @@ $loader-yellow: #f9c922;
   }
 
   .hyo-paginate {
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
+    position: absolute;
+    border: 1px solid rgba(0,0,0,.1);
     border-top: 1px solid rgba(0,0,0,.15);
-    box-shadow: 0 -2px 15px 0 rgba(0,0,0,.15);
-    padding: 10px 5px;
-    .navigator {
+    border-bottom-left-radius: .4em;
+    border-bottom-right-radius: .4em;
+    .pagination-wrapper {
       display: flex;
       flex-direction: row;
       align-items: center;
-      margin-right: 15px;
-      input {
-        font-family: Montserrat, sans-serif;
-        font-size: 14px;
-        height: 20px;
-        text-indent: 4px;
-        border-radius: 5px;
-        box-shadow: inset 0 1px 2px rgba(0,0,0, .55), 0px 1px 1px rgba(255,255,255,.5);
-        border: 1px solid #666;
-        width: 20px;
-      }
-      button {
-        background: rgba(0,0,0,.03);
-        margin: 0 5px;
-        float: left;
-        line-height: 12px;
-        border: 1px solid #ddd;
-        box-shadow: 2px 2px 2px #888888;
-        border-radius: .4em;
-        cursor: pointer;
+      justify-content: space-between;
+      padding: 10px 5px;
+      box-shadow: 0 -2px 15px 0 rgba(0,0,0,.15);
+      height: 25px;
+
+      .navigator {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-right: 15px;
+        input {
+          font-family: Montserrat, sans-serif;
+          font-size: 14px;
+          height: 20px;
+          text-indent: 4px;
+          border-radius: 5px;
+          box-shadow: inset 0 1px 2px rgba(0,0,0, .55), 0px 1px 1px rgba(255,255,255,.5);
+          border: 1px solid #666;
+          width: 30px;
+        }
+        button {
+          background: rgba(0,0,0,.03);
+          margin: 0 5px;
+          float: left;
+          line-height: 12px;
+          border: 1px solid #ddd;
+          box-shadow: 2px 2px 2px #888888;
+          border-radius: .4em;
+          cursor: pointer;
+        }
       }
     }
   }

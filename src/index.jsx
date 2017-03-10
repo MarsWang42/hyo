@@ -40,6 +40,7 @@ export default class Table extends Component {
       data,
       pageSize,
       pagination,
+      def,
     } = props;
 
     const pages = pagination? Math.floor(data.length / pageSize)-1 : 0;
@@ -49,6 +50,7 @@ export default class Table extends Component {
       pageRows,
       resolvedRows: data,
       pages,
+      cols: def,
     });
   }
 
@@ -145,10 +147,10 @@ export default class Table extends Component {
       resolvedRows,
       navigatorPage,
       filters,
+      cols,
     } = this.state;
 
     const {
-      def,
       filterable,
       data,
       pagination,
@@ -170,7 +172,7 @@ export default class Table extends Component {
     };
 
     const addFilter = (filter) => {
-      const filterCol = def.find(col => col.key === filter.key);
+      const filterCol = cols.find(col => col.key === filter.key);
       const newFilters = [...filters];
       newFilters.push({
         key: filter.key,
@@ -203,7 +205,7 @@ export default class Table extends Component {
      * renderFilter is a function that returns the filter UI.
      */
     const renderFilter = () => {
-      const options = def.filter(col =>
+      const options = cols.filter(col =>
         col.filterable && filters.find(filter => filter.key === col.key) === undefined);
       const generateFilters = () => {
         if (filters.length === 0) return;
@@ -267,63 +269,68 @@ export default class Table extends Component {
       const totalRows = resolvedRows.length;
       const startRow = (pageSize * (currentPage-1)) + 1;
       const endRow = Math.min(totalRows, (startRow + pageSize) - 1);
+      const loader = <div className="pagination-wrapper"><div>Loading...</div></div>;
       return (
-        <div className="hyo-paginate" style={{ width: width }}>
-          <div>Showing {startRow} to {endRow} of {totalRows} entries</div>
-          <div className="navigator" >
-            <button
-              type="button"
-              disabled={currentPage === 1}
-              onClick={() => changePage(1)}
-            >
-              &lt;&lt;
-            </button>
-            <button
-              type="button"
-              disabled={currentPage === 1}
-              onClick={() => changePage(currentPage-1)}
-            >
-              &lt;
-            </button>
-            <div>
-              Go to Page
-              <input
-                type="text"
-                onKeyDown={(e) => {
-                  if (e.keyCode === 13) {
-                    changePage(e.target.value);
-                  }
-                }}
-                value={navigatorPage}
-                onChange={(e) => {
-                  let page = e.target.value;
-                  if (page === "") this.setState({ navigatorPage: page });
-                  else {
-                    page = Math.min(Math.max(0, e.target.value), pages+1);
-                    this.setState({ navigatorPage: page });
-                  }
-                }}
-                onBlur={(e) => {
-                  changePage(e.target.value);
-                }}
-              />
-              of {pages+1}
+        <div className="hyo-paginate" style={{ width }}>
+          {isLoading ? loader : (
+            <div className="pagination-wrapper">
+              <div>Showing {startRow} to {endRow} of {totalRows} entries</div>
+              <div className="navigator" >
+                <button
+                  type="button"
+                  disabled={currentPage === 1}
+                  onClick={() => changePage(1)}
+                >
+                  &lt;&lt;
+                </button>
+                <button
+                  type="button"
+                  disabled={currentPage === 1}
+                  onClick={() => changePage(currentPage-1)}
+                >
+                  &lt;
+                </button>
+                <div>
+                  Go to Page
+                  <input
+                    type="text"
+                    onKeyDown={(e) => {
+                      if (e.keyCode === 13) {
+                        changePage(e.target.value);
+                      }
+                    }}
+                    value={navigatorPage}
+                    onChange={(e) => {
+                      let page = e.target.value;
+                      if (page === "") this.setState({ navigatorPage: page });
+                      else {
+                        page = Math.min(Math.max(0, e.target.value), pages+1);
+                        this.setState({ navigatorPage: page });
+                      }
+                    }}
+                    onBlur={(e) => {
+                      changePage(e.target.value);
+                    }}
+                  />
+                  of {pages+1}
+                </div>
+                <button
+                  type="button"
+                  disabled={currentPage === pages+1}
+                  onClick={() => changePage(currentPage+1)}
+                >
+                  &gt;
+                </button>
+                <button
+                  type="button"
+                  disabled={currentPage === pages+1}
+                  onClick={() => changePage(pages+1)}
+                >
+                  &gt;&gt;
+                </button>
+              </div>
             </div>
-            <button
-              type="button"
-              disabled={currentPage === pages+1}
-              onClick={() => changePage(currentPage+1)}
-            >
-              &gt;
-            </button>
-            <button
-              type="button"
-              disabled={currentPage === pages+1}
-              onClick={() => changePage(pages+1)}
-            >
-              &gt;&gt;
-            </button>
-          </div>
+          )}
         </div>
       );
     };
@@ -332,12 +339,13 @@ export default class Table extends Component {
      * renderHeaders returns headers according to definition
      */
     const renderHeaders = () => {
-      let currentPosition = 0, i = 0;
+      let currentPosition = 0;
+      let i = 0;
       const theadStyle = {
-        width: width,
+        width,
         height: headerHeight,
-      }
-      const headers = def.map((col) => {
+      };
+      const headers = cols.map((col) => {
         const thClassName = cn({
           "hyo-th": true,
           "sortable": col.sortable,
@@ -373,6 +381,7 @@ export default class Table extends Component {
       const style = {
         width: col.width,
         left: currentPosition,
+        height: rowHeight,
       };
       if (col.editable) {
         Cell = (<InlineEdit
@@ -404,7 +413,7 @@ export default class Table extends Component {
       const rows = pageRows.map((row) => {
         let j = 0;
         let currentCellPosition = 0;
-        const cell = def.map(col => {
+        const cell = cols.map((col) => {
           const currentCell = renderRowCell(row, col, i, j, currentCellPosition);
           currentCellPosition += col.width;
           j += 1;
@@ -412,9 +421,13 @@ export default class Table extends Component {
         });
         const rowStyle = {
           top: currentRowPosition,
-        }
+        };
+        const rowClassName = cn({
+          "hyo-tr": true,
+          "hyo-tr-highlighted": i%2 === 1,
+        })
         const currentRow = (
-          <div className="hyo-tr" key={`hyo-row-${i}`} style={rowStyle}>
+          <div className={rowClassName} key={`hyo-row-${i}`} style={rowStyle}>
             { cell }
           </div>
         );
@@ -423,19 +436,11 @@ export default class Table extends Component {
         return currentRow;
       });
       return (
-        <div className="hyo-tbody" style={{top: headerHeight}}>
+        <div className="hyo-tbody" style={{ top: headerHeight }}>
           {!isLoading && rows }
         </div>
       );
     };
-
-    const getColumnsWidth = (columns) => {
-      var width = 0;
-      for (var i = 0; i < columns.length; ++i) {
-        width += columns[i].props.width;
-      }
-      return width;
-    }
 
     /**
      * renderTable generates the whole table.
@@ -443,22 +448,22 @@ export default class Table extends Component {
     const renderTable = () => {
       const shownLoader = loader || <Spinner />;
       const style = {
-        height: height,
-        width: width,
-      }
+        height,
+        width,
+      };
+      const tableClass = cn({
+        "hyo-table": true,
+        "without-pagination": !pagination,
+      })
       return (
         <div className="hyo">
           { filterable && renderFilter() }
-          <div className="hyo-table" style={style}>
+          <div className={tableClass} style={style}>
             { renderHeaders() }
             { renderRows() }
+            { isLoading && shownLoader }
           </div>
-          { isLoading && (
-            <div className="table-spinner">
-              { shownLoader }
-            </div>
-          )}
-          { pagination && !isLoading && renderPagination() }
+          { pagination && renderPagination() }
         </div>
       );
     };

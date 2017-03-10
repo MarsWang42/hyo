@@ -92,9 +92,9 @@ class EditableTable extends Component {
       <Table
         def={def}
         data={this.state.data}
-        rowHeight={45}
+        rowHeight={35}
         headerHeight={35}
-        height={500}
+        height={450}
         width={1000}
         filterable
         pagination
