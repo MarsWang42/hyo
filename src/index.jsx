@@ -5,6 +5,7 @@ import InlineEdit from './inlineEdit';
 import Spinner from './spinner';
 import ColumnResizer from './resizeHandler';
 import HeaderCell from './headerCell';
+import WidthHelper from './helpers/sizeHelper';
 
 export default class Table extends Component {
   constructor(props) {
@@ -30,6 +31,11 @@ export default class Table extends Component {
       const { sortingCol, sortingDirection, filters, currentPage } = this.state;
       this.updateRows(nextProps.data, sortingCol, sortingDirection, filters, currentPage, true, true);
     }
+
+    if (nextProps.width !== this.props.width) {
+      const cols = WidthHelper.adjustColWidths(this.state.cols, nextProps.width);
+      this.setState({ cols });
+    }
   }
 
   /**
@@ -41,8 +47,10 @@ export default class Table extends Component {
       pageSize,
       pagination,
       def,
+      width,
     } = props;
 
+    const cols = WidthHelper.adjustColWidths(def, width);
     const pages = pagination? Math.floor(data.length / pageSize)-1 : 0;
     const pageRows = pagination ? data.slice(0, pageSize) : data;
 
@@ -50,7 +58,7 @@ export default class Table extends Component {
       pageRows,
       resolvedRows: data,
       pages,
-      cols: def,
+      cols,
     });
   }
 
@@ -269,6 +277,7 @@ export default class Table extends Component {
       const totalRows = resolvedRows.length;
       const startRow = (pageSize * (currentPage-1)) + 1;
       const endRow = Math.min(totalRows, (startRow + pageSize) - 1);
+      // When loading, render a loader for pagination navigator
       const paginationLoader = (
         <div className="pagination-wrapper">
           <div className="pagination-loader">Loading...</div>
@@ -277,7 +286,7 @@ export default class Table extends Component {
       return (
         <div className="hyo-paginate" style={{ width }}>
           {isLoading ? paginationLoader : (
-            <div className="pagination-wrapper">
+            <div className="pagination-wrapper" >
               <div>Showing {startRow} to {endRow} of {totalRows} entries</div>
               <div className="navigator" >
                 <button
@@ -356,7 +365,7 @@ export default class Table extends Component {
         });
         // if given width
         const thStyle = {
-          width: col.width,
+          width: col.adjustedWidth,
           left: currentPosition,
           height: headerHeight,
         };
@@ -367,11 +376,11 @@ export default class Table extends Component {
         });
         const currentHeaderCell = (
           <div key={`${col.key}-header-${i}`} className={thClassName} style={thStyle} onClick={() => sortColumn(col)}>
-            <HeaderCell value={col.key} spanClass={spanClass} initialWidth={col.width} />
+            <HeaderCell value={col.key} spanClass={spanClass} initialWidth={col.adjustedWidth} />
           </div>);
         // Increment the position and id
         i+=1;
-        currentPosition += col.width;
+        currentPosition += col.adjustedWidth;
         return currentHeaderCell;
       });
       return <div className="hyo-thead" style={theadStyle}><div className="hyo-tr">{headers}</div></div>;
@@ -383,7 +392,7 @@ export default class Table extends Component {
     const renderRowCell = (row, col, rowId, colId, currentPosition) => {
       let Cell;
       const style = {
-        width: col.width,
+        width: col.adjustedWidth,
         left: currentPosition,
         height: rowHeight,
       };
@@ -412,14 +421,13 @@ export default class Table extends Component {
      * renderRows returns each row according to data.
      */
     const renderRows = () => {
-      let i = 0;
       let currentRowPosition = 0;
-      const rows = pageRows.map((row) => {
-        let j = 0;
+      const rows = pageRows.map((row, i) => {
         let currentCellPosition = 0;
-        const cell = cols.map((col) => {
+        const cell = cols.map((col, j) => {
           const currentCell = renderRowCell(row, col, i, j, currentCellPosition);
-          currentCellPosition += col.width;
+          // Increment cell position and id
+          currentCellPosition += col.adjustedWidth;
           j += 1;
           return currentCell;
         });
@@ -435,7 +443,7 @@ export default class Table extends Component {
             { cell }
           </div>
         );
-        i+=1;
+        // Increment roww position and id
         currentRowPosition += rowHeight;
         return currentRow;
       });
@@ -471,7 +479,6 @@ export default class Table extends Component {
         </div>
       );
     };
-
 
     return renderTable();
   }

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import Table from '../src';
 
 const data = [
@@ -20,14 +21,38 @@ class EditableTable extends Component {
     this.state = {
       isLoading: false,
       data: [],
+      width: 0,
     };
+    this.update = this.update.bind(this);
+    this.onResize = this.onResize.bind(this);
   }
 
-  componentWillMount() {
+  componentDidMount() {
+    this.update();
+    const win = window;
+    if (win.addEventListener) {
+      win.addEventListener('resize', this.onResize, false);
+    } else if (win.attachEvent) {
+      win.attachEvent('onresize', this.onResize);
+    } else {
+      win.onresize = this.onResize;
+    }
     this.setState({ isLoading: true });
     setTimeout(() => {
       this.setState({ isLoading: false, data });
     }, 1000);
+  }
+
+  onResize() {
+    clearTimeout(this.updateTimer);
+    this.updateTimer = setTimeout(this.update, 16);
+  }
+
+  update() {
+    if (ReactDOM.findDOMNode(this.table)) {
+      const newWidth = (ReactDOM.findDOMNode(this.table).parentNode.clientWidth);
+      this.setState({ width: newWidth });
+    }
   }
 
   render() {
@@ -55,6 +80,7 @@ class EditableTable extends Component {
         editable: true,
         onEdit: updateValue,
         width: 125,
+        flexGrow: 1,
       },
       {
         key: "gender",
@@ -69,6 +95,7 @@ class EditableTable extends Component {
           { key: "Femail", label: "Female" },
         ],
         width: 125,
+        flexGrow: 1,
       },
       {
         key: "age",
@@ -79,23 +106,26 @@ class EditableTable extends Component {
         editable: true,
         onEdit: updateValue,
         width: 125,
+        flexGrow: 1,
       },
       {
         key: "birthday",
         label: "Birthday",
         renderer: dateRender,
         width: 125,
+        flexGrow: 1,
       },
     ];
 
     return (
       <Table
         def={def}
+        ref={(table) => { this.table = table; }}
         data={this.state.data}
         rowHeight={35}
         headerHeight={35}
-        height={450}
-        width="100%"
+        height={250}
+        width={this.state.width}
         filterable
         pagination
         pageSize={10}
