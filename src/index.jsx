@@ -269,10 +269,14 @@ export default class Table extends Component {
       const totalRows = resolvedRows.length;
       const startRow = (pageSize * (currentPage-1)) + 1;
       const endRow = Math.min(totalRows, (startRow + pageSize) - 1);
-      const loader = <div className="pagination-wrapper"><div>Loading...</div></div>;
+      const paginationLoader = (
+        <div className="pagination-wrapper">
+          <div className="pagination-loader">Loading...</div>
+        </div>
+      );
       return (
         <div className="hyo-paginate" style={{ width }}>
-          {isLoading ? loader : (
+          {isLoading ? paginationLoader : (
             <div className="pagination-wrapper">
               <div>Showing {startRow} to {endRow} of {totalRows} entries</div>
               <div className="navigator" >

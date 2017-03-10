@@ -413,7 +413,6 @@ $loader-yellow: #f9c922;
   }
 
   .hyo-paginate {
-    position: absolute;
     border: 1px solid rgba(0,0,0,.1);
     border-top: 1px solid rgba(0,0,0,.15);
     border-bottom-left-radius: .4em;
@@ -425,7 +424,10 @@ $loader-yellow: #f9c922;
       justify-content: space-between;
       padding: 10px 5px;
       box-shadow: 0 -2px 15px 0 rgba(0,0,0,.15);
-      height: 25px;
+
+      .pagination-loader {
+        padding: 2px;
+      }
 
       .navigator {
         display: flex;

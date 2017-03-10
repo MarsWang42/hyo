@@ -95,7 +95,7 @@ class EditableTable extends Component {
         rowHeight={35}
         headerHeight={35}
         height={450}
-        width={1000}
+        width="100%"
         filterable
         pagination
         pageSize={10}
