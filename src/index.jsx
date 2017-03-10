@@ -268,7 +268,7 @@ export default class Table extends Component {
       const startRow = (pageSize * (currentPage-1)) + 1;
       const endRow = Math.min(totalRows, (startRow + pageSize) - 1);
       return (
-        <div className="hyo-paginate">
+        <div className="hyo-paginate" style={{ width: width }}>
           <div>Showing {startRow} to {endRow} of {totalRows} entries</div>
           <div className="navigator" >
             <button
