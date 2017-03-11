@@ -355,7 +355,7 @@ export default class Table extends Component {
       let currentPosition = 0;
       let i = 0;
       const theadStyle = {
-        width,
+        width: WidthHelper.getHeaderWidth(cols, width),
         height: headerHeight,
       };
       const headers = cols.map((col) => {
@@ -375,7 +375,12 @@ export default class Table extends Component {
           "sortdown": col.sortable && col.key === sortingCol.key && sortingDirection === "desc",
         });
         const currentHeaderCell = (
-          <div key={`${col.key}-header-${i}`} className={thClassName} style={thStyle} onClick={() => sortColumn(col)}>
+          <div
+            key={`${col.key}-header-${i}`}
+            className={thClassName}
+            style={thStyle}
+            onClick={() => sortColumn(col)}
+          >
             <HeaderCell value={col.key} spanClass={spanClass} initialWidth={col.adjustedWidth} />
           </div>);
         // Increment the position and id
@@ -437,7 +442,7 @@ export default class Table extends Component {
         const rowClassName = cn({
           "hyo-tr": true,
           "hyo-tr-highlighted": i%2 === 1,
-        })
+        });
         const currentRow = (
           <div className={rowClassName} key={`hyo-row-${i}`} style={rowStyle}>
             { cell }
@@ -499,6 +504,10 @@ Table.propTypes = {
   pageSize: PropTypes.number,
   isLoading: PropTypes.bool,
   loader: PropTypes.element,
+  height: PropTypes.number.isRequired,
+  rowHeight: PropTypes.number.isRequired,
+  headerHeight: PropTypes.number.isRequired,
+  width: PropTypes.number.isRequired,
 };
 
 Table.defaultProps = {
