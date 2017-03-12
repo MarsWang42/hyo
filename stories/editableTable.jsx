@@ -96,6 +96,7 @@ class EditableTable extends Component {
         ],
         width: 125,
         flexGrow: 1,
+        resizable: true,
       },
       {
         key: "age",

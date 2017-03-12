@@ -12,7 +12,8 @@ export default class ResizeHandler extends Component {
     super(props);
     this.state = {
       width: 0,
-      cursorDelta: 0,
+      resizerPosition: 0,
+      mousePosition: 0,
     };
     this.onMove = this.onMove.bind(this);
     this.onColumnResizeEnd = this.onColumnResizeEnd.bind(this);
@@ -27,11 +28,13 @@ export default class ResizeHandler extends Component {
   }
 
   componentWillReceiveProps(newProps) {
-    if (newProps.initialEvent && !this.mouseTracker.isDragging) {
-      this.mouseTracker.captureMouseMoves(newProps.initialEvent);
+    const { initialEvent, leftOffset, initialWidth } = newProps;
+    if (initialEvent) {
+      this.mouseTracker.captureMouseMoves(initialEvent);
       this.setState({
-        width: newProps.initialWidth,
-        cursorDelta: newProps.initialWidth,
+        width: initialWidth,
+        resizerPosition: leftOffset,
+        mousePosition: leftOffset + initialWidth,
       });
     }
   }
@@ -42,12 +45,17 @@ export default class ResizeHandler extends Component {
   }
 
   onMove(deltaX) {
-    const newWidth = this.state.cursorDelta + deltaX;
-    const newColumnWidth = clamp(newWidth, this.props.maxWidth, this.props.minWidth);
+    const { leftOffset, maxWidth, minWidth } = this.props;
+    const { mousePosition, width } = this.state;
+    const newMousePosition = mousePosition + deltaX;
+    const newWidth = newMousePosition - leftOffset;
+    const newColumnWidth = clamp(newWidth, maxWidth, minWidth);
+    const newResizerPosition = leftOffset + newColumnWidth;
 
     this.setState({
       width: newColumnWidth,
-      cursorDelta: newWidth,
+      resizerPosition: newResizerPosition,
+      mousePosition: newMousePosition,
     });
   }
 
@@ -55,22 +63,18 @@ export default class ResizeHandler extends Component {
     this.mouseTracker.releaseMouseMoves();
     this.props.onColumnResizeEnd(
       this.state.width,
-      this.props.columnKey
+      this.props.columnKey,
     );
   }
 
   render() {
     const style = {
-      width: this.state.width,
+      width: this.state.resizerPosition,
       height: this.props.height,
+      display: this.props.isColumnResizing? "block" : "none",
     };
     return (
-      <div className="column-resizer" style={style}>
-        <div
-          className="column-resizer-mouse-area"
-          style={{ height: this.props.height }}
-        />
-      </div>
+      <div className="column-resizer" style={style} />
     );
   }
 }

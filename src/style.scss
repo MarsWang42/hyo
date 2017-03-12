@@ -252,15 +252,10 @@ $loader-yellow: #f9c922;
 .column-resizer {
   cursor: ew-resize;
   position: absolute;
-  right: -5px;
+  left: 0px;
   width: 12px;
-}
-
-.column-resizer-mouse-area {
   border-right-style: solid;
   border-right-width: 1px;
-  box-sizing: border-box;
-  position: absolute;
   z-index: 10;
 }
 
@@ -341,6 +336,7 @@ $loader-yellow: #f9c922;
     top: 0;
     z-index: 1;
     background-color: white;
+    background: rgba(0,0,0,.03);
     border-bottom: 1px solid rgba(0,0,0,.15);
     box-shadow: 0 2px 15px 0 rgba(0,0,0,.15);
     .hyo-tr {
@@ -351,7 +347,34 @@ $loader-yellow: #f9c922;
         top: 0;
         font-weight: normal;
         border-right: 1px solid rgba(0,0,0,.05);
-        background: rgba(0,0,0,.03);
+
+        .header-resizer {
+          position: absolute;
+          right: 0px;
+          width: 6px;
+          z-index: 1;
+        }
+
+        .header-resizer:hover {
+          cursor: ew-resize;
+        }
+
+        .header-resizer:hover .header-resizer-knob {
+          visibility: visible;
+        }
+
+        .header-resizer-knob {
+          position: absolute;
+          right: 0px;
+          visibility: hidden;
+          width: 4px;
+          background: #0284ff;
+        }
+
+        .th-content {
+          padding: 7px 5px;
+        }
+
         &.sortable {
           cursor: pointer;
         }
@@ -393,22 +416,26 @@ $loader-yellow: #f9c922;
         position: absolute;
         top: 0;
         border-right: 1px solid rgba(0,0,0,.02);
+        padding: 7px 5px;
         &:last-child {
           border-right:0
         }
       }
+
+      .hyo-tr-background {
+        position: absolute;
+      }
+      .hyo-tr-highlighted {
+        background-color: rgba(0,0,0,.05)
+      }
     }
 
-    .hyo-tr-highlighted .hyo-td {
-      background-color: rgba(0,0,0,.05)
-    }
   }
 
   .hyo-th, .hyo-td {
     box-sizing: border-box;
     white-space: nowrap;
     text-overflow: ellipsis;
-    padding: 7px 5px;
   }
 
   .hyo-paginate {

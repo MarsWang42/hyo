@@ -1,11 +1,14 @@
 const getTotalWidth = cols =>
   cols.reduce((totalWidth, col) => totalWidth += col.width || 0, 0);
 
+const getAdjustedTotalWidth = cols =>
+  cols.reduce((totalWidth, col) => totalWidth += col.adjustedWidth || 0, 0);
+
 const getTotalFlexGrow = cols =>
   cols.reduce((totalFlexGrow, col) => totalFlexGrow += col.flexGrow || 0, 0);
 
 const getHeaderWidth = (cols, expectedWidth) => {
-  const totalColsWidth = getTotalWidth(cols);
+  const totalColsWidth = getAdjustedTotalWidth(cols);
   return Math.max(totalColsWidth, expectedWidth);
 };
 
@@ -56,6 +59,7 @@ const adjustColWidths = (cols, expectedWidth) => {
 
 const WidthHelper = {
   getTotalWidth,
+  getAdjustedTotalWidth,
   getTotalFlexGrow,
   getHeaderWidth,
   distributeFlexWidth,

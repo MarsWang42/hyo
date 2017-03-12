@@ -1,14 +1,45 @@
 import React from 'react';
-import ColumnResizer from './resizeHandler';
 
-const HeaderCell = ({ value, initialWidth, spanClass }) => {
-  return (
-    <div>
-      <ColumnResizer initialWidth="28px" initialEvent={{clientX: 1, clientY: 2, preventDefault: function(){}}}/>
-      { value }
-      <span className={spanClass} />
-    </div>
-  );
+const HeaderCell = ({
+  value,
+  width,
+  height,
+  spanClass,
+  resizable,
+  onColumnResizerMouseDown,
+}) => {
+  let headerResizer = null;
+  if (resizable) {
+    const headerResizerStyle = { height };
+    headerResizer = (
+      <div
+        className="header-resizer"
+        style={headerResizerStyle}
+        onMouseDown={onColumnResizerMouseDown}
+      >
+        <div
+          className="header-resizer-knob"
+          style={headerResizerStyle}
+        />
+      </div>
+    );
+    return (
+      <div>
+        { headerResizer }
+        <div className="th-content">
+          { value }
+          <span className={spanClass} />
+        </div>
+      </div>
+    );
+  } else {
+    return (
+      <div className="th-content">
+        { value }
+        <span className={spanClass} />
+      </div>
+    );
+  }
 };
 
 export default HeaderCell;

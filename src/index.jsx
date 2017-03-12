@@ -18,6 +18,7 @@ export default class Table extends Component {
       navigatorPage: 1,
       resolvedRows: [],
       filters: [],
+      columnResizingData: {},
     };
   }
 
@@ -156,6 +157,8 @@ export default class Table extends Component {
       navigatorPage,
       filters,
       cols,
+      columnResizingData,
+      isColumnResizing,
     } = this.state;
 
     const {
@@ -207,6 +210,50 @@ export default class Table extends Component {
 
     const changePage = (index) => {
       this.updateRows(resolvedRows, sortingCol, sortingDirection, filters, index);
+    };
+
+    /**
+     * This is called when a cell that is in the header of a column has its
+     * resizer knob clicked on. It displays the resizer and puts in the correct
+     * location on the table.
+     */
+    const onColumnResize = (
+      leftOffset,
+      cellWidth,
+      cellMinWidth,
+      cellMaxWidth,
+      columnKey,
+      event,
+    ) => {
+      this.setState({
+        isColumnResizing: true,
+        columnResizingData: {
+          left: leftOffset,
+          width: cellWidth,
+          maxWidth: cellMaxWidth,
+          minWidth: cellMinWidth,
+          initialEvent: {
+            clientX: event.clientX,
+            clientY: event.clientY,
+            preventDefault: () => {},
+          },
+          key: columnKey,
+        },
+      });
+    };
+
+    const onColumnResizeEndCallback = (newColWidth, colKey) => {
+      const newCol = Object.assign(cols.find(col => col.key === colKey), { adjustedWidth: newColWidth });
+      const newCols = Object.assign(cols).map((col) => {
+        if (col.key !== colKey) return col;
+        else return newCol;
+      });
+
+      this.setState({
+        cols: newCols,
+        columnResizingData: {},
+        isColumnResizing: false,
+      });
     };
 
     /**
@@ -353,12 +400,12 @@ export default class Table extends Component {
      */
     const renderHeaders = () => {
       let currentPosition = 0;
-      let i = 0;
       const theadStyle = {
         width: WidthHelper.getHeaderWidth(cols, width),
         height: headerHeight,
       };
-      const headers = cols.map((col) => {
+
+      const headers = cols.map((col, i) => {
         const thClassName = cn({
           "hyo-th": true,
           "sortable": col.sortable,
@@ -374,6 +421,21 @@ export default class Table extends Component {
           "sortup": col.sortable && col.key === sortingCol.key && sortingDirection === "asc",
           "sortdown": col.sortable && col.key === sortingCol.key && sortingDirection === "desc",
         });
+
+        const onHeaderResize = (function() {
+          const leftOffset = currentPosition;
+          return (e) => {
+            onColumnResize(
+              leftOffset,
+              col.adjustedWidth,
+              col.width,
+              col.maxWidth,
+              col.key,
+              e,
+            );
+          };
+        })();
+
         const currentHeaderCell = (
           <div
             key={`${col.key}-header-${i}`}
@@ -381,14 +443,38 @@ export default class Table extends Component {
             style={thStyle}
             onClick={() => sortColumn(col)}
           >
-            <HeaderCell value={col.key} spanClass={spanClass} initialWidth={col.adjustedWidth} />
+            <HeaderCell
+              value={col.key}
+              spanClass={spanClass}
+              width={col.adjustedWidth}
+              height={headerHeight}
+              resizable={col.resizable}
+              onColumnResizerMouseDown={onHeaderResize}
+            />
           </div>);
         // Increment the position and id
-        i+=1;
         currentPosition += col.adjustedWidth;
         return currentHeaderCell;
       });
-      return <div className="hyo-thead" style={theadStyle}><div className="hyo-tr">{headers}</div></div>;
+      const dragKnob = (<ColumnResizer
+        height={height}
+        initialWidth={columnResizingData.width || 0}
+        minWidth={columnResizingData.minWidth || 0}
+        maxWidth={columnResizingData.maxWidth || Number.MAX_VALUE}
+        leftOffset={columnResizingData.left || 0}
+        initialEvent={columnResizingData.initialEvent}
+        onColumnResizeEnd={onColumnResizeEndCallback}
+        columnKey={columnResizingData.key}
+        isColumnResizing={isColumnResizing}
+      />);
+      return (
+        <div className="hyo-thead" style={theadStyle}>
+          <div className="hyo-tr">
+            {dragKnob}
+            {headers}
+          </div>
+        </div>
+      );
     };
 
     /**
@@ -439,12 +525,17 @@ export default class Table extends Component {
         const rowStyle = {
           top: currentRowPosition,
         };
-        const rowClassName = cn({
-          "hyo-tr": true,
+        const backgroundStyle = {
+          height: rowHeight,
+          width: WidthHelper.getHeaderWidth(cols, width),
+        }
+        const backgroundClassName = cn({
+          "hyo-tr-background": true,
           "hyo-tr-highlighted": i%2 === 1,
         });
         const currentRow = (
-          <div className={rowClassName} key={`hyo-row-${i}`} style={rowStyle}>
+          <div className="hyo-tr" key={`hyo-row-${i}`} style={rowStyle}>
+            <div className={backgroundClassName} style={backgroundStyle} />
             { cell }
           </div>
         );

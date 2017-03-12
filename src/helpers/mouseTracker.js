@@ -97,11 +97,6 @@ class MouseTracker {
   }
 
   /**
-   * Returns whether or not if the mouse movement is being tracked.
-   */
-  isDragging() { return this.isDragging; }
-
-  /**
    * Calls onMove passed into constructor and updates internal state.
    */
   onMouseMove(event) {
