@@ -595,10 +595,10 @@ Table.propTypes = {
   pageSize: PropTypes.number,
   isLoading: PropTypes.bool,
   loader: PropTypes.element,
-  height: PropTypes.number.isRequired,
-  rowHeight: PropTypes.number.isRequired,
-  headerHeight: PropTypes.number.isRequired,
-  width: PropTypes.number.isRequired,
+  height: PropTypes.number,
+  rowHeight: PropTypes.number,
+  headerHeight: PropTypes.number,
+  width: PropTypes.number,
 };
 
 Table.defaultProps = {
@@ -607,4 +607,8 @@ Table.defaultProps = {
   pageSize: 0,
   isLoading: false,
   loader: undefined,
+  height: 500,
+  rowHeight: 35,
+  headerHeight: 40,
+  width: 800,
 };

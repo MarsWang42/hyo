@@ -49,7 +49,7 @@ const distributeFlexWidth = (cols, flexWidth) => {
 
 const adjustColWidths = (cols, expectedWidth) => {
   // Initialize cols. TODO: improve performance
-  cols = cols.map(col => Object.assign(col, {adjustedWidth: col.width}));
+  cols = cols.map(col => Object.assign(col, { adjustedWidth: col.width || 125 }));
   const colsWidth = getTotalWidth(cols);
   if (colsWidth < expectedWidth) {
     return distributeFlexWidth(cols, expectedWidth - colsWidth).cols;
