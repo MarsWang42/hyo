@@ -24,14 +24,9 @@ const requestAnimationFrame =
     }, timeDelay);
   };
 
-// Works around a rare bug in Safari 6 where the first request is never invoked.
 requestAnimationFrame(function () {});
 
 class MouseTracker {
-  /**
-   * onMove is the callback that will be called on every mouse move.
-   * onMoveEnd is called on mouse up when movement has ended.
-   */
   constructor(onMove, onMoveEnd, domNode) {
     this.isDragging = false;
     this.animationFrameID = null;
@@ -44,10 +39,8 @@ class MouseTracker {
   }
 
   /**
-   * This is to set up the listeners for listening to mouse move
-   * and mouse up signaling the movement has ended. Please note that these
-   * listeners are added at the document.body level. It takes in an event
-   * in order to grab inital state.
+   * captureMouseMoves will track states via given event and bind
+   * events onto the body.
    */
   captureMouseMoves(event) {
     if (!this.eventMoveToken && !this.eventUpToken) {
@@ -74,7 +67,7 @@ class MouseTracker {
   }
 
   /**
-   * These releases all of the listeners on document.body.
+   * releaseMouseMoves will release all events binded to the body.
    */
   releaseMouseMoves() {
     if (this.eventMoveToken && this.eventUpToken) {
@@ -97,7 +90,7 @@ class MouseTracker {
   }
 
   /**
-   * Calls onMove passed into constructor and updates internal state.
+   * onMouseMove will update internal states while mouse moved.
    */
   onMouseMove(event) {
     const x = event.clientX;
@@ -118,6 +111,9 @@ class MouseTracker {
     event.preventDefault();
   }
 
+ /**
+  * didMouseMove will be triggered to clean internal states.
+  */
   didMouseMove() {
     this.animationFrameID = null;
     this.onMove(this.deltaX, this.deltaY);
@@ -126,7 +122,7 @@ class MouseTracker {
   }
 
   /**
-   * Calls onMoveEnd passed into constructor and updates internal state.
+   * onMouseUp will be call to clean states after mouse movement done.
    */
   onMouseUp() {
     if (this.animationFrameID) {

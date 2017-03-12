@@ -1,8 +1,7 @@
 const emptyFunction = function () {};
 
 /**
- * Upstream version of event listener. Does not take into account specific
- * nature of platform.
+ * EventListener helper funciton. TODO: check all browser compability.
  */
 const EventListener = {
   /**

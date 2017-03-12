@@ -33,7 +33,7 @@ export default class ResizeHandler extends Component {
       this.mouseTracker.captureMouseMoves(initialEvent);
       this.setState({
         width: initialWidth,
-        resizerPosition: leftOffset,
+        resizerPosition: leftOffset + initialWidth - 1,
         mousePosition: leftOffset + initialWidth,
       });
     }
@@ -50,7 +50,7 @@ export default class ResizeHandler extends Component {
     const newMousePosition = mousePosition + deltaX;
     const newWidth = newMousePosition - leftOffset;
     const newColumnWidth = clamp(newWidth, maxWidth, minWidth);
-    const newResizerPosition = leftOffset + newColumnWidth;
+    const newResizerPosition = leftOffset + newColumnWidth - 1;
 
     this.setState({
       width: newColumnWidth,

@@ -317,7 +317,7 @@ export default class Table extends Component {
       );
     };
 
-    /*
+    /**
      * Render the Pgination Controller.
      */
     const renderPagination = () => {

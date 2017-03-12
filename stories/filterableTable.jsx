@@ -12,6 +12,7 @@ const def = [
     key: "name",
     label: "Name",
     filterable: true,
+    resizable: true,
   },
   {
     key: "gender",

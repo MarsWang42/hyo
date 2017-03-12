@@ -17,7 +17,7 @@ export default class Dropdown extends Component {
     this.hideDropdown = this.hideDropdown.bind(this);
   }
 
-  /*
+  /**
    * bind the onBlur event
    */
   componentDidMount() {
@@ -31,7 +31,7 @@ export default class Dropdown extends Component {
     document.removeEventListener('touchend', this.hideDropdown, false)
   }
 
-  /*
+  /**
    * handle onBlur situation
    */
   hideDropdown(event) {
@@ -58,7 +58,7 @@ export default class Dropdown extends Component {
       filter,
     } = this.state;
 
-    /*
+    /**
      * trigger the onchange method from props if given
      */
     const triggerChangeEvent = (newState) => {
@@ -67,7 +67,7 @@ export default class Dropdown extends Component {
       }
     };
 
-    /*
+    /**
      * setValue reset the current chosen value in state and close the dropdown.
      */
     const setValue = (key, label) => {
@@ -82,7 +82,7 @@ export default class Dropdown extends Component {
       this.setState(newState);
     };
 
-    /*
+    /**
      * handleMouseDown toggles the dropdown.
      */
     const handleMouseDown = (event) => {
@@ -106,7 +106,7 @@ export default class Dropdown extends Component {
       this.setState({ filter: event.target.value });
     };
 
-    /*
+    /**
      * rederOption read the options from props and feed it to buildMenu
      */
     const renderOption = (option) => {
@@ -129,7 +129,7 @@ export default class Dropdown extends Component {
       );
     };
 
-    /*
+    /**
      * build Menu generate the dropdown menu
      */
     const buildMenu = () => {
