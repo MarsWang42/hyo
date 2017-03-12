@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import MouseTracker from './helpers/mouseTracker';
+import Utils from './helpers/utils';
 
 const clamp = (width, maxWidth, minWidth) => {
   if (width > maxWidth) width = maxWidth;
@@ -29,7 +30,7 @@ export default class ResizeHandler extends Component {
 
   componentWillReceiveProps(newProps) {
     const { initialEvent, leftOffset, initialWidth } = newProps;
-    if (initialEvent) {
+    if (!Utils.isEmpty(initialEvent)) {
       this.mouseTracker.captureMouseMoves(initialEvent);
       this.setState({
         width: initialWidth,
@@ -46,7 +47,7 @@ export default class ResizeHandler extends Component {
 
   onMove(deltaX) {
     const { leftOffset, maxWidth, minWidth } = this.props;
-    const { mousePosition, width } = this.state;
+    const { mousePosition } = this.state;
     const newMousePosition = mousePosition + deltaX;
     const newWidth = newMousePosition - leftOffset;
     const newColumnWidth = clamp(newWidth, maxWidth, minWidth);
@@ -80,12 +81,21 @@ export default class ResizeHandler extends Component {
 }
 
 ResizeHandler.propTypes = {
-  height: PropTypes.number.isRequired,
-  leftOffset: PropTypes.number.isRequired,
-  maxWidth: PropTypes.number.isRequired,
-  minWidth: PropTypes.number.isRequired,
-  colKey: PropTypes.string.isRequired,
-  onColumnResizeEnd: PropTypes.func.isRequired,
-  isColumnResizing: PropTypes.bool.isRequired,
+  height: PropTypes.number,
+  leftOffset: PropTypes.number,
+  maxWidth: PropTypes.number,
+  minWidth: PropTypes.number,
+  colKey: PropTypes.string,
+  onColumnResizeEnd: PropTypes.func,
+  isColumnResizing: PropTypes.bool,
 };
 
+ResizeHandler.defaultProps = {
+  height: 0,
+  leftOffset: 0,
+  maxWidth: 1000,
+  minWidth: 0,
+  colKey: "",
+  onColumnResizeEnd: null,
+  isColumnResizing: false,
+};

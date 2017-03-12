@@ -49,17 +49,23 @@ export default class Table extends Component {
       pagination,
       def,
       width,
+      height,
+      rowHeight,
+      headerHeight,
     } = props;
 
     const cols = WidthHelper.adjustColWidths(def, width);
     const pages = pagination? Math.floor(data.length / pageSize)-1 : 0;
     const pageRows = pagination ? data.slice(0, pageSize) : data;
+    const rowNum = pagination ? pageSize : data.length;
+    const newHeight = Math.min(height, (rowHeight * rowNum) + headerHeight);
 
     this.setState({
       pageRows,
       resolvedRows: data,
       pages,
       cols,
+      height: newHeight,
     });
   }
 
@@ -150,6 +156,7 @@ export default class Table extends Component {
     const {
       sortingCol,
       sortingDirection,
+      height,
       pageRows,
       pages,
       currentPage,
@@ -168,7 +175,6 @@ export default class Table extends Component {
       pageSize,
       isLoading,
       loader,
-      height,
       rowHeight,
       headerHeight,
       width,
@@ -428,7 +434,7 @@ export default class Table extends Component {
             onColumnResize(
               leftOffset,
               col.adjustedWidth,
-              col.width,
+              col.width || 125,
               col.maxWidth,
               col.key,
               e,
@@ -610,5 +616,5 @@ Table.defaultProps = {
   height: 500,
   rowHeight: 35,
   headerHeight: 40,
-  width: 800,
+  width: 700,
 };
