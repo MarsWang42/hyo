@@ -161,7 +161,7 @@ export default class Dropdown extends Component {
       'Dropdown-control': !inline,
       'Dropdown-disabled': disabled,
       'Dropdown-remove': remove,
-    })
+    });
     const menu = isOpen ? <div className="Dropdown-menu">{buildMenu()}</div> : null;
     const placeHolderValue = typeof selected === 'string' ? selected : selected.label;
     const content = (<div className="Dropdown-placeholder">{shownContent || placeHolderValue}</div>);
@@ -198,6 +198,7 @@ Dropdown.propTypes = {
   remove: PropTypes.bool,
   shownContent: PropTypes.string,
   filterable: PropTypes.bool,
+  inline: PropTypes.bool,
   onRemove: PropTypes.func,
 };
 
@@ -208,5 +209,6 @@ Dropdown.defaultProps = {
   remove: false,
   shownContent: "",
   filterable: false,
+  inline: false,
   onRemove: undefined,
 };

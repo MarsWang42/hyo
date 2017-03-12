@@ -222,7 +222,7 @@ export default class Table extends Component {
       cellWidth,
       cellMinWidth,
       cellMaxWidth,
-      columnKey,
+      colKey,
       event,
     ) => {
       this.setState({
@@ -237,7 +237,7 @@ export default class Table extends Component {
             clientY: event.clientY,
             preventDefault: () => {},
           },
-          key: columnKey,
+          key: colKey,
         },
       });
     };
@@ -434,7 +434,7 @@ export default class Table extends Component {
               e,
             );
           };
-        })();
+        }());
 
         const currentHeaderCell = (
           <div
@@ -464,7 +464,7 @@ export default class Table extends Component {
         leftOffset={columnResizingData.left || 0}
         initialEvent={columnResizingData.initialEvent}
         onColumnResizeEnd={onColumnResizeEndCallback}
-        columnKey={columnResizingData.key}
+        colKey={columnResizingData.key}
         isColumnResizing={isColumnResizing}
       />);
       return (
@@ -528,7 +528,7 @@ export default class Table extends Component {
         const backgroundStyle = {
           height: rowHeight,
           width: WidthHelper.getHeaderWidth(cols, width),
-        }
+        };
         const backgroundClassName = cn({
           "hyo-tr-background": true,
           "hyo-tr-highlighted": i%2 === 1,
@@ -562,7 +562,7 @@ export default class Table extends Component {
       const tableClass = cn({
         "hyo-table": true,
         "without-pagination": !pagination,
-      })
+      });
       return (
         <div className="hyo">
           { filterable && renderFilter() }

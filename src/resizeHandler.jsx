@@ -33,7 +33,7 @@ export default class ResizeHandler extends Component {
       this.mouseTracker.captureMouseMoves(initialEvent);
       this.setState({
         width: initialWidth,
-        resizerPosition: leftOffset + initialWidth - 1,
+        resizerPosition: (leftOffset + initialWidth) - 1,
         mousePosition: leftOffset + initialWidth,
       });
     }
@@ -50,7 +50,7 @@ export default class ResizeHandler extends Component {
     const newMousePosition = mousePosition + deltaX;
     const newWidth = newMousePosition - leftOffset;
     const newColumnWidth = clamp(newWidth, maxWidth, minWidth);
-    const newResizerPosition = leftOffset + newColumnWidth - 1;
+    const newResizerPosition = (leftOffset + newColumnWidth) - 1;
 
     this.setState({
       width: newColumnWidth,
@@ -63,7 +63,7 @@ export default class ResizeHandler extends Component {
     this.mouseTracker.releaseMouseMoves();
     this.props.onColumnResizeEnd(
       this.state.width,
-      this.props.columnKey,
+      this.props.colKey,
     );
   }
 
@@ -78,3 +78,14 @@ export default class ResizeHandler extends Component {
     );
   }
 }
+
+ResizeHandler.propTypes = {
+  height: PropTypes.number.isRequired,
+  leftOffset: PropTypes.number.isRequired,
+  maxWidth: PropTypes.number.isRequired,
+  minWidth: PropTypes.number.isRequired,
+  colKey: PropTypes.string.isRequired,
+  onColumnResizeEnd: PropTypes.func.isRequired,
+  isColumnResizing: PropTypes.bool.isRequired,
+};
+
