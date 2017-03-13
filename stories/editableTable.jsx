@@ -73,6 +73,7 @@ class EditableTable extends Component {
     };
 
     const onSort = (sortingData, key, direction) => {
+      console.log(key, direction);
       return sortingData.sort((a, b) => {
         const attr1 = a[key];
         const attr2 = b[key];

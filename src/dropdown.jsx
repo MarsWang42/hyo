@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import cn from 'classnames';
+import EventListener from './helpers/eventListener';
 
 export default class Dropdown extends Component {
   constructor(props) {
@@ -21,14 +22,22 @@ export default class Dropdown extends Component {
    * bind the onBlur event
    */
   componentDidMount() {
-    document.addEventListener('click', this.hideDropdown, false)
-    document.addEventListener('touchend', this.hideDropdown, false)
+    this.eventClickToken = EventListener.listen(
+      document,
+      'click',
+      this.hideDropdown,
+    );
+    this.eventTouchendToken = EventListener.listen(
+      document,
+      'touchend',
+      this.hideDropdown,
+    );
   }
 
   componentWillUnmount() {
     this.mounted = false;
-    document.removeEventListener('click', this.hideDropdown, false)
-    document.removeEventListener('touchend', this.hideDropdown, false)
+    this.eventClickToken.remove();
+    this.eventTouchendToken.remove();
   }
 
   /**
