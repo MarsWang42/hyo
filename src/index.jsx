@@ -114,21 +114,29 @@ export default class Table extends Component {
     if (filtering && filterable) {
       let filteredRows = [...data];
       for (let i = 0, length = newFilters.length; i < length; i+=1) {
+        const keyword = newFilters[i].keyword;
         // Use the side effect of sort method.
-        filteredRows = filteredRows.filter((row) => {
-          const keyword = newFilters[i].keyword;
-          const cell = row[newFilters[i].key];
-          switch (newFilters[i].filterType) {
-            case 'input':
-              return cell.toString().toLowerCase().includes(keyword.toLowerCase());
-            case 'select':
-              // If it is a select filter, must match the whole keyword
-              if (keyword === "") return true;
-              else return cell.toString() === keyword;
-            default:
-              return cell.toString().toLowerCase().includes(keyword.toLowerCase());
-          }
-        });
+        if (newFilters[i].onFilter) {
+          filteredRows = newFilters[i].onFilter(
+            filteredRows,
+            keyword,
+            newFilters[i].key,
+          );
+        } else {
+          filteredRows = filteredRows.filter((row) => {
+            const cell = row[newFilters[i].key];
+            switch (newFilters[i].filterType) {
+              case 'input':
+                return cell.toString().toLowerCase().includes(keyword.toLowerCase());
+              case 'select':
+                // If it is a select filter, must match the whole keyword
+                if (keyword === "") return true;
+                else return cell.toString() === keyword;
+              default:
+                return cell.toString().toLowerCase().includes(keyword.toLowerCase());
+            }
+          });
+        }
       }
       newResolvedRows = filteredRows;
     }
@@ -201,6 +209,7 @@ export default class Table extends Component {
         filterType: filterCol.filterType,
         label: filter.label,
         typehead: filterCol.filterTypehead,
+        onFilter: filterCol.onFilter,
       });
       this.updateRows(data, sortingCol, sortingDirection, newFilters, currentPage, true);
     };
@@ -287,36 +296,40 @@ export default class Table extends Component {
               <span className="clear-btn" onClick={() => removeFilter(filter.key)} />
             </div>
           );
-          switch (filter.filterType) {
-            case 'input': {
-              return defaultFilter;
-            }
-            // For select filter, checkout all unique value in the column
-            // and put them in options.
-            case 'select': {
-              const l = data.length;
-              const flags = {};
-              const filterOptions = [{ key: "", label: "all" }];
-              for (let i = 0; i < l; i+=1) {
-                const filterOption = data[i][filter.key];
-                if (!flags[filterOption]) {
-                  flags[filterOption] = true;
-                  filterOptions.push({ key: filterOption, label: filterOption });
-                }
+          if (typeof filter.filterType === 'function') {
+            return filter.filterType(filter, updateFilter, removeFilter);
+          } else if (filter.filterType === undefined || typeof filter.filterType === "string") {
+            switch (filter.filterType) {
+              case 'input': {
+                return defaultFilter;
               }
-              return (<Dropdown
-                options={filterOptions}
-                key={`${filter.key}-filter`}
-                onChange={col => updateFilter(filter.key, col.key)}
-                remove
-                onRemove={() => removeFilter(filter.key)}
-                filterable={filter.typehead}
-                placeholder={`${filter.label} Filter`}
-              />);
+              // For select filter, checkout all unique value in the column
+              // and put them in options.
+              case 'select': {
+                const l = data.length;
+                const flags = {};
+                const filterOptions = [{ key: "", label: "all" }];
+                for (let i = 0; i < l; i+=1) {
+                  const filterOption = data[i][filter.key];
+                  if (!flags[filterOption]) {
+                    flags[filterOption] = true;
+                    filterOptions.push({ key: filterOption, label: filterOption });
+                  }
+                }
+                return (<Dropdown
+                  options={filterOptions}
+                  key={`${filter.key}-filter`}
+                  onChange={col => updateFilter(filter.key, col.key)}
+                  remove
+                  onRemove={() => removeFilter(filter.key)}
+                  filterable={filter.typehead}
+                  placeholder={`${filter.label} Filter`}
+                />);
+              }
+              default:
+                return defaultFilter;
             }
-            default:
-              return defaultFilter;
-          }
+          } else return defaultFilter;
         });
       };
       return (

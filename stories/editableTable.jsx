@@ -82,6 +82,27 @@ class EditableTable extends Component {
       });
     };
 
+    const ageFilter = (filter, updateFilter, removeFilter) => {
+      const defaultFilter = (
+        <div className="text-filter" key={`${filter.key}-filter`}>
+          <input
+            type="text"
+            id={`${filter.key}-filter`}
+            onChange={e => updateFilter(filter.key, e.target.value)}
+            placeholder={`${filter.label}`}
+          />
+          <span className="clear-btn" onClick={() => removeFilter(filter.key)} />
+        </div>
+      );
+      return defaultFilter;
+    };
+
+    const ageOnFilter = (rows, keyword, key) => {
+      return rows.filter((row) => {
+        return row[key].toString().toLowerCase().includes(keyword.toLowerCase());
+      });
+    };
+
     const def = [
       {
         key: "name",
@@ -97,6 +118,7 @@ class EditableTable extends Component {
         label: "Gender",
         filterable: true,
         filterType: "select",
+        filterTypehead: true,
         editable: true,
         onEdit: updateValue,
         editType: "select",
@@ -112,7 +134,8 @@ class EditableTable extends Component {
         key: "age",
         label: "Age",
         filterable: true,
-        filterType: "input",
+        filterType: ageFilter,
+        onFilter: ageOnFilter,
         sortable: true,
         onSort,
         editable: true,
