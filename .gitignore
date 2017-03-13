@@ -2,6 +2,8 @@
 logs
 *.log
 npm-debug.log*
+
+# Yarn related
 yarn-debug.log*
 yarn-error.log*
 yarn.lock
