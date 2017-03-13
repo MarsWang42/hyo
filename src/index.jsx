@@ -94,14 +94,18 @@ export default class Table extends Component {
     // Figure out the current direction.
     // If column is not select, then set direction to be asc.
     // If it is already selected, set to be the opposite direction.
-      newResolvedRows = data.sort((a, b) => {
-        const attr1 = a[newSortingCol.key];
-        const attr2 = b[newSortingCol.key];
-        const defaultOrder = !attr1 ? -1 : !attr2 ? 1 : attr1.toString().localeCompare(attr2);
-        // Here you can load the columns's onSort function if it has.
-        const order = newSortingCol.onSort? newSortingCol.onSort(attr1, attr2) : defaultOrder;
-        return newSortingDirection === 'asc' ? order : -order;
-      });
+      const defaultSortFunction = (sortingData) => {
+        return sortingData.sort((a, b) => {
+          const attr1 = a[newSortingCol.key];
+          const attr2 = b[newSortingCol.key];
+          const order = !attr1 ? -1 : !attr2 ? 1 : attr1.toString().localeCompare(attr2);
+          return newSortingDirection === 'asc' ? order : -order;
+        });
+      };
+      // Here you can load the columns's onSort function if it has.
+      newResolvedRows = newSortingCol.onSort ?
+        newSortingCol.onSort(data, newSortingCol.key, newSortingDirection) :
+        defaultSortFunction(data);
     }
 
     // Take two params, Col and Keyword.

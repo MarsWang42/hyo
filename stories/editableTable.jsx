@@ -72,6 +72,15 @@ class EditableTable extends Component {
       }
     };
 
+    const onSort = (sortingData, key, direction) => {
+      return sortingData.sort((a, b) => {
+        const attr1 = a[key];
+        const attr2 = b[key];
+        const order = !attr1 ? -1 : !attr2 ? 1 : attr1.toString().localeCompare(attr2);
+        return direction === 'desc' ? order : -order;
+      });
+    };
+
     const def = [
       {
         key: "name",
@@ -104,6 +113,7 @@ class EditableTable extends Component {
         filterable: true,
         filterType: "input",
         sortable: true,
+        onSort,
         editable: true,
         onEdit: updateValue,
         width: 125,
