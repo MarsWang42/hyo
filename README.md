@@ -8,6 +8,10 @@ Hyo is now available from the npm package manager. Navigate to your project fold
 * `yarn add hyo` - Using yarn.
 * `npm install --save hyo` - Using npm.
 
+Then import styles by including our `style.min.css`
+
+* ``<link rel="stylesheet" href="node_modules/hyo/style.min.css">``
+
 ### Your First Table
 With only two props, you can make your first Hyo table.
 ``` javascript
