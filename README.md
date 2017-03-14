@@ -1,9 +1,12 @@
 # Hyo :mount_fuji:
-\- A light-weight datatable for React
+\- A light-weight datatable for React, made with :gift_heart:.
+
+![hyo](https://marswang92.github.io/hyo/img/Hyo.gif "Hyo")
+
 ## Getting Started
 
 ### Installation
-Hyo is now available from the npm package manager. Navigate to your project folder, and you can install it with the following commands 
+Hyo is now available from the npm package manager. Navigate to your project folder, and you can install it with the following commands
 
 * `yarn add hyo` - Using yarn.
 * `npm install --save hyo` - Using npm.
@@ -30,3 +33,4 @@ With only two props, you can make your first Hyo table.
   return <Table def={def} data={data} />;`
 ```
 * For more examples, see [LiveDemo](http://hyo-mars.herokuapp.com/) and [Documentation](https://marswang92.github.io/hyo/).
+
