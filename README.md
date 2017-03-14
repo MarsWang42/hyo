@@ -1,5 +1,5 @@
 # Hyo :mount_fuji:
-\- A light-weight datatable for React, made with :gift_heart:.
+\- A light-weight datatable for React.
 
 ![hyo](https://marswang92.github.io/hyo/img/Hyo.gif "Hyo")
 
