@@ -86,6 +86,9 @@ export default class Table extends Component {
       filterable,
       pagination,
       pageSize,
+      height,
+      rowHeight,
+      headerHeight,
     } = this.props;
     let newResolvedRows = data;
     let updatedRows;
@@ -127,13 +130,13 @@ export default class Table extends Component {
             const cell = row[newFilters[i].key];
             switch (newFilters[i].filterType) {
               case 'input':
-                return cell.toString().toLowerCase().includes(keyword.toLowerCase());
+                return cell && cell.toString().toLowerCase().includes(keyword.toLowerCase());
               case 'select':
                 // If it is a select filter, must match the whole keyword
                 if (keyword === "") return true;
                 else return cell.toString() === keyword;
               default:
-                return cell.toString().toLowerCase().includes(keyword.toLowerCase());
+                return cell && cell.toString().toLowerCase().includes(keyword.toLowerCase());
             }
           });
         }
@@ -152,6 +155,9 @@ export default class Table extends Component {
       updatedRows = newResolvedRows.slice(startRow, endRow);
     } else updatedRows = newResolvedRows;
 
+    const rowNum = pagination ? pageSize : data.length;
+    const newHeight = Math.min(height, (rowHeight * rowNum) + headerHeight);
+
     this.setState({
       pageRows: updatedRows,
       filters: newFilters,
@@ -161,6 +167,7 @@ export default class Table extends Component {
       navigatorPage: newCurrentPage,
       resolvedRows: newResolvedRows,
       pages: newPages,
+      height: newHeight,
     });
   }
 
@@ -310,7 +317,7 @@ export default class Table extends Component {
                 const flags = {};
                 const filterOptions = [{ key: "", label: "all" }];
                 for (let i = 0; i < l; i+=1) {
-                  const filterOption = data[i][filter.key];
+                  const filterOption = data[i][filter.key] || "";
                   if (!flags[filterOption]) {
                     flags[filterOption] = true;
                     filterOptions.push({ key: filterOption, label: filterOption });
@@ -467,7 +474,7 @@ export default class Table extends Component {
             onClick={() => sortColumn(col)}
           >
             <HeaderCell
-              value={col.key}
+              value={col.label}
               spanClass={spanClass}
               width={col.adjustedWidth}
               height={headerHeight}
@@ -523,7 +530,7 @@ export default class Table extends Component {
           editType={col.editType}
           editOptions={col.editOptions}
         />);
-      } else Cell = col.renderer ? col.renderer(row[col.key]) : row[col.key];
+      } else Cell = col.renderer ? col.renderer(row[col.key], row) : row[col.key];
       return (
         <div className="hyo-td" style={style} key={`cell-${colId}-${rowId}`}>
           { Cell }
