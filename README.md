@@ -1,7 +1,7 @@
 # Hyo :mount_fuji:
 \- A light-weight datatable for React.
 
-![hyo](https://marswang92.github.io/hyo/img/Hyo.gif "Hyo")
+![hyo](https://s9.postimg.org/u0qnah3bz/Hyo.gif?noredir=1 "Hyo")
 
 ## Getting Started
 
