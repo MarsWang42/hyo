@@ -62,6 +62,4 @@ var config = {
   plugins: plugins,
 };
 
-var UglifyJsPlu
-
 module.exports = config;
