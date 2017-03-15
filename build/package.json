@@ -1,0 +1,27 @@
+{
+  "name": "hyo",
+  "version": "0.1.5",
+  "description": "A light-weight datatable for React",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Marswang92/hyo.git"
+  },
+  "keywords": [
+    "React"
+  ],
+  "author": "Mars Wang",
+  "license": "MIT",
+  "dependencies": {
+    "classnames": "^2.2.5",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Marswang92/hyo/issues"
+  },
+  "homepage": "https://hyo-mars.herokuapp.com/"
+}
