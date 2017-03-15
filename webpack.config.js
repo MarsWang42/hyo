@@ -1,7 +1,6 @@
 var webpack = require('webpack');
 var path = require('path');
 
-
 var UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
 var env = process.env.WEBPACK_ENV;
 
@@ -20,7 +19,7 @@ var BUILD_DIR = path.resolve(__dirname, 'build');
 var SRC_DIR = path.resolve(__dirname, 'src');
 
 var config = {
-  entry: SRC_DIR + '/index.jsx',
+  entry: SRC_DIR + '/index',
   output: {
     path: BUILD_DIR,
     filename: outputFile,

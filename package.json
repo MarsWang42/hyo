@@ -8,8 +8,8 @@
   "license": "MIT",
   "scripts": {
     "storybook": "start-storybook -p 9001 -c .storybook -s src/assets",
-    "dev": "WEBPACK_ENV=build ./node_modules/.bin/webpack -d",
-    "build": "WEBPACK_ENV=build ./node_modules/.bin/webpack --progress --colors && sass src/style.scss:build/style.min.css --style compressed && rm -rf .sass-cache"
+    "dev": "WEBPACK_ENV=build webpack -d",
+    "build": "WEBPACK_ENV=build gulp build"
   },
   "dependencies": {
     "@kadira/storybook": "^2.35.3",
@@ -28,8 +28,13 @@
     "eslint-plugin-import": "latest",
     "eslint-plugin-jsx-a11y": "latest",
     "eslint-plugin-react": "latest",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^3.1.0",
     "node-sass": "^4.5.0",
     "sass-loader": "^6.0.2",
-    "webpack": "^2.2.1"
+    "webpack": "^2.2.1",
+    "webpack-stream": "^3.2.0"
   }
 }
