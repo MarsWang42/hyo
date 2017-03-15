@@ -5,18 +5,18 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">   
-    <link rel="shortcut icon" href="./img/favicon.ico">
+    <link rel="shortcut icon" href="../img/favicon.ico">
 
-    <title>HYO</title>
+    <title>中文 - HYO</title>
 
-    <link href="./css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" href="//cdn.jsdelivr.net/font-hack/2.018/css/hack.min.css">
     <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
     <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
-    <link href="./css/base.css" rel="stylesheet">
-    <link href="./css/cinder.css" rel="stylesheet">
-    <link rel="stylesheet" href="./css/highlight.css">
+    <link href="../css/base.css" rel="stylesheet">
+    <link href="../css/cinder.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/highlight.css">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -36,7 +36,7 @@
     
 </head>
 
-<body class="homepage" >
+<body>
 
     <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
@@ -54,7 +54,7 @@
             
 
             <!-- Main title -->
-            <a class="navbar-brand" href=".">HYO</a>
+            <a class="navbar-brand" href="..">HYO</a>
         </div>
 
         <!-- Expanded navigation -->
@@ -64,14 +64,14 @@
                 <ul class="nav navbar-nav">
                 
                 
-                    <li class="active">
-                        <a href=".">English</a>
+                    <li >
+                        <a href="..">English</a>
                     </li>
                 
                 
                 
-                    <li >
-                        <a href="chinese/">中文</a>
+                    <li class="active">
+                        <a href="./">中文</a>
                     </li>
                 
                 
@@ -85,13 +85,13 @@
                     </a>
                 </li>
                 
-                    <li class="disabled">
-                        <a rel="next" >
+                    <li >
+                        <a rel="next" href="..">
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
-                    <li >
-                        <a rel="prev" href="chinese/">
+                    <li class="disabled">
+                        <a rel="prev" >
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -107,13 +107,13 @@
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
     
-        <li class="first-level active"><a href="#documentation">Documentation</a></li>
+        <li class="first-level active"><a href="#_1">文档</a></li>
         
-            <li class="second-level"><a href="#getting-started">Getting Started</a></li>
+            <li class="second-level"><a href="#_2">从零开始</a></li>
             
-                <li class="third-level"><a href="#installation">Installation</a></li>
+                <li class="third-level"><a href="#_3">安装</a></li>
             
-                <li class="third-level"><a href="#your-first-table">Your First Table</a></li>
+                <li class="third-level"><a href="#hyo">您的第一个Hyo表格</a></li>
             
         
             <li class="second-level"><a href="#api">API</a></li>
@@ -128,159 +128,158 @@
 </div></div>
         <div class="col-md-9" role="main">
 
-<h1 id="documentation">Documentation</h1>
+<h1 id="_1">文档</h1>
 <hr/>
 
-<h2 id="getting-started">Getting Started</h2>
-<h3 id="installation">Installation</h3>
-<p>Hyo is now available from the npm package manager. Navigate to your project folder, and you can install it with the following commands </p>
+<h2 id="_2">从零开始</h2>
+<h3 id="_3">安装</h3>
+<p>Hyo 现已登陆npm管理器。 使用命令行管理器进入您的项目文件夹，运行如下指令</p>
 <ul>
-<li><code>yarn add hyo</code> - Using yarn.</li>
-<li><code>npm install --save hyo</code> - Using npm.</li>
+<li><code>yarn add hyo</code> - 使用 yarn 安装</li>
+<li><code>npm install --save hyo</code> - 使用 npm 安装</li>
 </ul>
-<p>Then import styles by including our <code>style.min.css</code></p>
+<p>安装完成后在您的html文件中导入 <code>style.min.css</code></p>
 <ul>
 <li><code>&lt;link rel="stylesheet" href="node_modules/hyo/style.min.css"&gt;</code></li>
 </ul>
-<h3 id="your-first-table">Your First Table</h3>
-<p>With only two props, you can make your first Hyo table.</p>
+<h3 id="hyo">您的第一个Hyo表格</h3>
+<p>只需要输入两个 props，您就可以生成属于您的第一个 Hyo 表格了。</p>
 <pre><code class="javascript">  import Table from 'hyo';
 
   const def = [
-    { key: &quot;name&quot;, label: &quot;Name&quot;, flexGrow: 1, resizable: true },
-    { key: &quot;gender&quot;, label: &quot;Gender&quot;, flexGrow: 1 },
+    { key： &quot;name&quot;, label： &quot;Name&quot;, flexGrow： 1, resizable： true },
+    { key： &quot;gender&quot;, label： &quot;Gender&quot;, flexGrow： 1 },
   ];
 
   const data = [
-    { name: &quot;Mars&quot;, gender: &quot;Male&quot; },
-    { name: &quot;Tony&quot;, gender: &quot;Male&quot; },
+    { name： &quot;Mars&quot;, gender： &quot;Male&quot; },
+    { name： &quot;Tony&quot;, gender： &quot;Male&quot; },
   ];
 
   return &lt;Table def={def} data={data} /&gt;;`
 </code></pre>
 
 <ul>
-<li>For more examples, see <a href="http://hyo-mars.herokuapp.com/">liveDemo</a>.</li>
+<li>更多的例子请点击 <a href="../http：//hyo-mars.herokuapp.com/">liveDemo</a>.</li>
 </ul>
 <p><br/></p>
 <h2 id="api">API</h2>
 <h3 id="table">Table</h3>
 <p><code>def</code></p>
 <blockquote>
-<p>type: <code>Array</code> </p>
-<p><code>Table</code> component requires <code>def</code> props to define each of the columns.</p>
+<p>类型： <code>Array</code> </p>
+<p><code>Table</code> 组件需要 <code>def</code> props 来定义每一行需要如何渲染，具体会在下文中提到。</p>
 </blockquote>
 <p><code>data</code> </p>
 <blockquote>
-<p>type: <code>Array</code></p>
-<p><code>data</code> props contains all the rows to be rendered in the <code>Table</code> component.</p>
+<p>类型： <code>Array</code></p>
+<p><code>data</code> props 应包含所有您需要显示在 <code>Table</code> 组件中的内容。注意如果要改变表单中的内容，改变时必须同时将该 <code>isLoading</code> 设定为 true，改变完成后再设定回 false。</p>
 </blockquote>
 <p><code>width</code></p>
 <blockquote>
-<p>type: <code>Number</code></p>
-<p><code>width</code> props defines the display width of the component. Overflow width of the rows will be clipped and a scrolling mechanism is provided.</p>
+<p>类型： <code>Number</code></p>
+<p><code>width</code> props 定义了表格的宽度，溢出部分通过滚动条控制。</p>
 </blockquote>
 <p><code>height</code></p>
 <blockquote>
-<p>type: <code>Number</code></p>
-<p><code>height</code> props defines the display height of the component. Overflow content will be clipped and a scrolling mechanism is provided. Note that filters and pagination controller are not counted in the <code>height</code> props.</p>
+<p>类型： <code>Number</code></p>
+<p><code>height</code> props 定义了表格的高度，溢出部分通过滚动条控制。需注意过滤控制 UI 与分页控制 UI 的高度不被计算在内。</p>
 </blockquote>
 <p><code>headerHeight</code></p>
 <blockquote>
-<p>type: <code>Number</code></p>
-<p>Height of the header row.</p>
+<p>类型： <code>Number</code></p>
+<p>表单头部的高度。</p>
 </blockquote>
 <p><code>rowHeight</code></p>
 <blockquote>
-<p>type: <code>Number</code></p>
-<p>Height of the data rows and pagination controller.</p>
+<p>类型： <code>Number</code></p>
+<p>表单内容每一行的高度。</p>
 </blockquote>
 <p><code>filterable</code></p>
 <blockquote>
-<p>type: <code>Boolean</code></p>
-<p>Controls the rendering of filters.</p>
+<p>类型： <code>Boolean</code></p>
+<p>控制过滤控制 UI 的显示。</p>
 </blockquote>
 <p><code>pagination</code></p>
 <blockquote>
-<p>type: <code>Boolean</code></p>
-<p>Controls the rendering of pagination bar.</p>
+<p>类型： <code>Boolean</code></p>
+<p>控制分页控制 UI 的显示。</p>
 </blockquote>
 <p><code>pageSize</code></p>
 <blockquote>
-<p>type: <code>Number</code></p>
-<p>If <code>pagination</code> is set to be true, <code>pageSize</code> defines how many rows will be shown in each page.</p>
+<p>类型： <code>Number</code></p>
+<p>如果 <code>pagination</code> 被设定为 true, <code>pageSize</code> 将定义每一页显示的行数。</p>
 </blockquote>
 <p><code>isLoading</code></p>
 <blockquote>
-<p>type: <code>Boolean</code></p>
-<p>Controls the rendering of spinner.</p>
+<p>类型： <code>Boolean</code></p>
+<p>控制载入动画的显示。注意如果要改变表单中的内容，改变时必须同时将该 prop 设定为 true，改变完成后再设定回 false。</p>
 </blockquote>
 <hr/>
 
 <h3 id="def">def</h3>
 <ul>
-<li><code>def</code> prop defines the feature of each column.</li>
+<li><code>def</code> prop 定义了每一列应当如何被渲染。</li>
 </ul>
 <p><code>key</code></p>
 <blockquote>
-<p>type: <code>String</code></p>
-<p>The corresponding property name from <code>data</code> prop. eg. 'name'</p>
+<p>类型： <code>String</code></p>
+<p>该列应当显示的数据，对应 <code>data</code> prop中的每一列名称。例如：'name'</p>
 </blockquote>
 <p><code>label</code></p>
 <blockquote>
-<p>type: <code>String</code></p>
-<p>Label of the column being shown on the header.</p>
+<p>类型： <code>String</code></p>
+<p>在表单头部显示的列名称。</p>
 </blockquote>
 <p><code>width</code></p>
 <blockquote>
-<p>type: <code>Number</code></p>
-<p>Width of the column. By default 125px.</p>
+<p>类型： <code>Number</code></p>
+<p>该列的宽度，默认为 125px 。</p>
 </blockquote>
 <p><code>flexGrow</code></p>
 <blockquote>
-<p>type: <code>Number</code></p>
-<p>Specifies the flex grow factor of each column. It tells what amount of space should each column take up from ramining width.</p>
+<p>类型： <code>Number</code></p>
+<p>指明该列的弹性拉伸因子。该参数控制表格多余宽度中，每一列所占宽度的比例。</p>
 </blockquote>
 <p><code>resizable</code></p>
 <blockquote>
-<p>type: <code>Boolean</code></p>
-<p>Defines the column can be resized or not.</p>
+<p>类型： <code>Boolean</code></p>
+<p>定义该列是否可以通过表单头部控制宽度</p>
 </blockquote>
 <p><code>renderer</code></p>
 <blockquote>
-<p>type: <code>Function</code> parameters: <code>value</code>, <code>row</code></p>
-<p>Return a component telling how <code>value</code> to be rendered. Othere columns' information can be reached through parameter <code>row</code>.</p>
+<p>类型： <code>Function</code> 参数： <code>value</code>, <code>row</code></p>
+<p>该函数需返回一个组件，定义该列每一格应当如何显示。该函数提供两个参数。<code>value</code>参数是该格的内容，对应<code>data</code> props 中该行的数据格式。 <code>row</code>参数提供该行其他列的数据。</p>
 </blockquote>
 <p><code>sortable</code></p>
 <blockquote>
-<p>type: <code>Boolean</code></p>
-<p>Defines the column can be sorted or not.</p>
+<p>类型： <code>Boolean</code></p>
+<p>定义是否能排序该列来控制表单内容显示顺序。</p>
 </blockquote>
 <p><code>onSort</code></p>
 <blockquote>
-<p>type: <code>Function</code> parameters: <code>rows</code>, <code>key</code>, <code>direction</code></p>
-<p>Defines how rows being sorted by given direction.</p>
+<p>类型： <code>Function</code> 参数： <code>rows</code>, <code>key</code>, <code>direction</code></p>
+<p>定义该列的排序方法。见例：</p>
 </blockquote>
 <pre><code class="javascript">  const onSort = (rows, key, direction) =&gt; {
     return rows.sort((a, b) =&gt; {
       const attr1 = a[key];
       const attr2 = b[key];
-      const order = !attr1 ? -1 : !attr2 ? 1 : attr1.toString().localeCompare(attr2);
-      return direction === 'desc' ? order : -order;
+      const order = !attr1 ? -1 ： !attr2 ? 1 ： attr1.toString().localeCompare(attr2);
+      return direction === 'desc' ? order ： -order;
     });
   };
 </code></pre>
 
 <p><code>filterable</code></p>
 <blockquote>
-<p>type: <code>Boolean</code></p>
-<p>Defines the column can be filtered or not.</p>
+<p>类型： <code>Boolean</code></p>
+<p>定义是否能通过该列来过滤表单。</p>
 </blockquote>
 <p><code>filterType</code></p>
 <blockquote>
-<p>type: <code>String</code> or <code>Function</code> &nbsp; &nbsp;parameters: <code>filter</code>, <code>updateFilter</code>, <code>removeFilter</code></p>
-<p>User can choose the filter to be either <strong>'input'</strong> or <strong>'select'</strong>. Moreover, you can also give a function which returns a filter component. It takes three parameters: <code>filter</code> is an object with key and keyword, telling the key of column being filtered and the current keyword; <code>updateFilter</code> is a function that will trigger the rows to be rerendered; <code>removeFilter</code> is a function that will remove this filter.</p>
-<p>Here's an example of <code>filterType</code> function:</p>
+<p>类型： <code>String</code> or <code>Function</code> &nbsp; &nbsp;参数： <code>filter</code>, <code>updateFilter</code>, <code>removeFilter</code></p>
+<p>你可以设定过滤控制 UI 为 <strong>'input'</strong> （直接输入）或 <strong>'select'</strong> （下拉选择）。此外您还可以选择设定为一个返回过滤 UI 组件的函数。该函数提供三项参数，这里是一个<code>filterType</code> 函数的例子：</p>
 </blockquote>
 <pre><code class="javascript">  const filterType = (filter, updateFilter, removeFilter) =&gt; {
     return defaultFilter = (
@@ -299,8 +298,8 @@
 
 <p><code>onFilter</code></p>
 <blockquote>
-<p>type: <code>Function</code> parameters: <code>rows</code>, <code>keyword</code>, <code>key</code></p>
-<p><code>onFilter</code> is a function that being triggered when the column's filter being updated. Check the example:</p>
+<p>类型： <code>Function</code> 参数： <code>rows</code>, <code>keyword</code>, <code>key</code></p>
+<p><code>onFilter</code> 定义该列如何过滤表单。见例：</p>
 </blockquote>
 <pre><code class="javascript">  const ageOnFilter = (rows, keyword, key) =&gt; {
     return rows.filter((row) =&gt; {
@@ -311,24 +310,24 @@
 
 <p><code>editable</code></p>
 <blockquote>
-<p>type: <code>Boolean</code></p>
-<p>Defines the column can be edited or not.</p>
+<p>类型： <code>Boolean</code></p>
+<p>定义该列是否能在行内编辑。</p>
 </blockquote>
 <p><code>editType</code></p>
 <blockquote>
-<p>type: <code>String</code></p>
-<p>Tells the type of the inline edit. Options are <strong>'input'</strong> and <strong>'select'</strong>.</p>
+<p>类型： <code>String</code></p>
+<p>定义行内编辑的类型，可设置为 <strong>'input'</strong> （直接输入）或 <strong>'select'</strong> （下拉选择）。</p>
 </blockquote>
 <p><code>editOptions</code></p>
 <blockquote>
-<p>type: <code>Array</code></p>
-<p>If <code>editType</code> is set to be <strong><code>select</code></strong>, you can give an array of options that user can choose from. Example:</p>
+<p>类型： <code>Array</code></p>
+<p>如果<code>editType</code> 被设定为 <strong>'select'</strong> , 您可以制定下来选择的选项，例如：</p>
 </blockquote>
 <pre><code class="javascript">  {
     ...
-    editOptions: [
-      { key: &quot;Male&quot;, label: &quot;Male&quot; },
-      { key: &quot;Female&quot;, label: &quot;Female&quot; },
+    editOptions： [
+      { key： &quot;Male&quot;, label： &quot;Male&quot; },
+      { key： &quot;Female&quot;, label： &quot;Female&quot; },
     ],
     ...
   }
@@ -337,16 +336,16 @@
 
 <p><code>onEdit</code></p>
 <blockquote>
-<p>type: <code>Function</code> parameters: <code>row</code>, <code>col</code>, <code>rowId</code>, <code>value</code></p>
-<p><code>onEdit</code> is a function that defines what to do when a cell is edited. Check the example:</p>
+<p>类型： <code>Function</code> 参数： <code>row</code>, <code>col</code>, <code>rowId</code>, <code>value</code></p>
+<p>此函数将在行内编辑完成时触发，见例：</p>
 </blockquote>
 <pre><code class="javascript">  const updateValue = (row, col, rowId, value) =&gt; {
     const newData = [...this.state.data];
     const rowToUpdate = newData.find(d =&gt; d.id === row.id);
     if (rowToUpdate[col].toString() !== value.toString()) {
       rowToUpdate[col] = value;
-      this.setState({ isLoading: true });
-      setTimeout(() =&gt; this.setState({ data: newData, isLoading: false }), 300);
+      this.setState({ isLoading： true });
+      setTimeout(() =&gt; this.setState({ data： newData, isLoading： false }), 300);
     }
   };
 </code></pre></div>
@@ -359,15 +358,15 @@
         <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
     </footer>
 
-    <script src="./js/jquery-1.10.2.min.js"></script>
-    <script src="./js/bootstrap-3.0.3.min.js"></script>
-    <script src="./js/highlight.pack.js"></script>
+    <script src="../js/jquery-1.10.2.min.js"></script>
+    <script src="../js/bootstrap-3.0.3.min.js"></script>
+    <script src="../js/highlight.pack.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
     <script>
-    var base_url = '.';
+    var base_url = '..';
     </script>
-    <script data-main="./mkdocs/js/search.js" src="./mkdocs/js/require.js"></script>
-    <script src="./js/base.js"></script>
+    <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script>
+    <script src="../js/base.js"></script>
 
     <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
         <div class="modal-dialog">
@@ -399,8 +398,3 @@
     </body>
 
 </html>
-
-<!--
-MkDocs version : 0.16.1
-Build Date UTC : 2017-03-15 01:39:42
--->
