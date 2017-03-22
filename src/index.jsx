@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import ReactDOM from 'react-dom';
 import cn from 'classnames';
 import Dropdown from './dropdown';
 import InlineEdit from './inlineEdit';
@@ -6,6 +7,7 @@ import Spinner from './spinner';
 import ColumnResizer from './resizeHandler';
 import HeaderCell from './headerCell';
 import WidthHelper from './helpers/sizeHelper';
+import ResizeSensor from './helpers/resizeSensor';
 
 export default class Table extends Component {
   constructor(props) {
@@ -20,10 +22,20 @@ export default class Table extends Component {
       filters: [],
       columnResizingData: {},
     };
+    this.updateWidth = this.updateWidth.bind(this);
+    this.onResize = this.onResize.bind(this);
   }
 
   componentWillMount() {
     this.initializeStates(this.props);
+  }
+
+  componentDidMount() {
+    if (this.props.width === "auto") {
+      const parentNode = ReactDOM.findDOMNode(this.table).parentNode;
+      this.updateWidth(parentNode);
+      this.resizeSensor = new ResizeSensor(parentNode, () => this.onResize(parentNode));
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -39,6 +51,18 @@ export default class Table extends Component {
     }
   }
 
+  onResize(domNode) {
+    clearTimeout(this.updateTimer);
+    this.updateTimer = setTimeout(() => this.updateWidth(domNode), 16);
+  }
+
+  updateWidth(domNode) {
+    if (domNode) {
+      const newWidth = (domNode.clientWidth - 20);
+      this.setState({ width: newWidth });
+    }
+  }
+
   /**
    * initializeStates initializes the states with given props.
    */
@@ -48,11 +72,12 @@ export default class Table extends Component {
       pageSize,
       pagination,
       def,
-      width,
       height,
       rowHeight,
       headerHeight,
     } = props;
+    let { width } = props;
+    if (width === "auto") width = 700;
 
     const cols = WidthHelper.adjustColWidths(def, width);
     const pages = pagination? Math.floor(data.length / pageSize)-1 : 0;
@@ -66,6 +91,7 @@ export default class Table extends Component {
       pages,
       cols,
       height: newHeight,
+      width,
     });
   }
 
@@ -185,6 +211,7 @@ export default class Table extends Component {
       cols,
       columnResizingData,
       isColumnResizing,
+      width,
     } = this.state;
 
     const {
@@ -196,7 +223,6 @@ export default class Table extends Component {
       loader,
       rowHeight,
       headerHeight,
-      width,
     } = this.props;
 
     const sortColumn = (col) => {
@@ -594,7 +620,7 @@ export default class Table extends Component {
         "without-pagination": !pagination,
       });
       return (
-        <div className="hyo">
+        <div className="hyo" ref={(table) => { this.table = table; }}>
           { filterable && renderFilter() }
           <div className={tableClass} style={style}>
             { renderHeaders() }
@@ -628,7 +654,7 @@ Table.propTypes = {
   height: PropTypes.number,
   rowHeight: PropTypes.number,
   headerHeight: PropTypes.number,
-  width: PropTypes.number,
+  width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 
 Table.defaultProps = {
