@@ -33,7 +33,7 @@ export default class Table extends Component {
   componentDidMount() {
     if (this.props.width === "auto") {
       const parentNode = ReactDOM.findDOMNode(this.table).parentNode;
-      this.updateWidth(parentNode);
+      this.initializeWidth(parentNode);
       this.resizeSensor = new ResizeSensor(parentNode, () => this.onResize(parentNode));
     }
   }
@@ -63,6 +63,15 @@ export default class Table extends Component {
     }
   }
 
+  initializeWidth(domNode) {
+    if (domNode) {
+      const newWidth = (domNode.clientWidth - 20);
+      const cols = WidthHelper.adjustColWidths(this.props.def, newWidth);
+      this.setState({ width: newWidth, cols });
+    }
+  }
+
+
   /**
    * initializeStates initializes the states with given props.
    */
@@ -77,7 +86,7 @@ export default class Table extends Component {
       headerHeight,
     } = props;
     let { width } = props;
-    if (width === "auto") width = 700;
+    if (width === "auto") width = 100000;
 
     const cols = WidthHelper.adjustColWidths(def, width);
     const pages = pagination? Math.floor(data.length / pageSize)-1 : 0;
