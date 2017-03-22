@@ -1,0 +1,503 @@
+$breakpoint-alpha: 480px;
+@import url('http://fonts.googleapis.com/css?family=Montserrat:300,400,700');
+
+/*
+ * Dropdown Button Style
+ */
+.Dropdown-root {
+  position: relative;
+  margin: 5px 15px;
+}
+
+.Dropdown-control {
+  font-family: Lato,sans-serif,sans-serif;
+  font-size: 12px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  position: relative;
+  overflow: hidden;
+  background-color: rgba(0,0,0,0.02);
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  box-sizing: border-box;
+  color: #333;
+  cursor: pointer;
+  outline: none;
+  padding: 8px 52px 8px 10px;
+  transition: all 200ms ease;
+
+  .Dropdown-arrow {
+    right: 10px;
+    top: 14px;
+  }
+}
+
+.Dropdown-inline-root {
+  position: relative;
+  cursor: pointer;
+
+  .Dropdown-arrow {
+    right: 10px;
+    top: 8px;
+  }
+
+  .Dropdown-menu {
+    top: 98%;
+  }
+}
+
+.Dropdown-remove {
+  padding: 8px 52px 8px 34px;
+  .remove-btn {
+    position: absolute;
+    left: 10px;
+    top: 7px;
+    display: inline-block;
+    cursor: pointer;
+    background-image: url('http://svgshare.com/i/sb.svg');
+    width: 15px;
+    height: 15px;
+    min-width: 15px;
+    min-height: 15px;
+    background-size: 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+  }
+}
+
+.Dropdown-control:hover {
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+}
+
+.Dropdown-arrow {
+  border-color: #999 transparent transparent;
+  border-style: solid;
+  border-width: 5px 5px 0;
+  content: ' ';
+  display: block;
+  height: 0;
+  margin-top: -ceil(2.5);
+  position: absolute;
+  width: 0
+}
+
+.is-open .Dropdown-arrow {
+  border-color: transparent transparent #999;
+  border-width: 0 5px 5px;
+}
+
+.Dropdown-menu {
+  font-family: Lato,sans-serif,sans-serif;
+  font-size: 12px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+  margin-top: -1px;
+  max-height: 200px;
+  overflow-y: auto;
+  position: absolute;
+  top: 100%;
+  width: 100%;
+  z-index: 1000;
+  -webkit-overflow-scrolling: touch;
+}
+
+.Dropdown-filter {
+  width: 95%;
+  align-self: center;
+  margin: 5px 0;
+  input {
+    box-sizing: border-box;
+    width: 100%;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding: 5px 30px 5px 5px;
+  }
+  .search-btn {
+    position: absolute;
+    right: 6%;
+    top: 13px;
+    display: inline-block;
+    background-image: url('http://svgshare.com/i/u5.svg');
+    width: 15px;
+    height: 15px;
+    min-width: 15px;
+    min-height: 15px;
+    background-size: 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+  }
+}
+
+.Dropdown-option {
+  box-sizing: border-box;
+  color: rgba(51, 51, 51, 0.8);
+  cursor: pointer;
+  display: block;
+  padding: 8px 10px;
+}
+
+.Dropdown-option:last-child {
+  border-bottom-right-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+
+.Dropdown-option:hover {
+  background-color: #f2f9fc;
+  color: #333;
+}
+
+.Dropdown-option.is-selected {
+  background-color: #f2f9fc;
+  color: #333;
+}
+
+.Dropdown-noresults {
+  box-sizing: border-box;
+  color: #ccc;
+  cursor: default;
+  display: block;
+  padding: 8px 10px;
+}
+
+/*
+ * Inline Edit Style
+ */
+
+.inline-edit-text {
+  cursor: pointer;
+}
+.inline-edit-input {
+  box-sizing: border-box;
+  width: 100%;
+  font-size: 12px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/*
+ * Spinner Style
+ */
+
+$loader-blue: #3498db;
+$loader-orange: #e74c3c;
+$loader-yellow: #f9c922;
+
+.loader-wrapper {
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 19000;
+}
+
+.loader {
+  display: block;
+  position: relative;
+  left: 50%;
+  top: 50%;
+  width: 150px;
+  height: 150px;
+  margin: -75px 0 0 -75px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: $loader-blue;
+  animation: spin 2s linear infinite;
+  z-index: 1001;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    border-top-color: $loader-orange;
+    animation: spin 3s linear infinite;
+  }
+
+  &:after {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    border-top-color: $loader-yellow;
+    animation: spin 1.5s linear infinite;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/*
+ * Column resizer style.
+ */
+
+.column-resizer {
+  cursor: ew-resize;
+  position: absolute;
+  left: 0px;
+  width: 12px;
+  border-right-style: solid;
+  border-right-width: 1px;
+  z-index: 10;
+}
+
+/*
+ * Hyo Table Button Style
+ */
+.hyo {
+  font-family: Lato,sans-serif,sans-serif;
+  font-size: 11px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  margin: 0;
+  width: 100%;
+  min-width: 300px;
+
+  .filter{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 8px;
+
+    .Dropdown-root, .text-filter{
+      margin: 5px 15px;
+      min-width: 160px;
+    }
+
+    .Dropdown-control {
+      border-color: #939393;
+      border-radius: 2px;
+      font-size: 13px;
+      background-color: white;
+    }
+
+    .Dropdown-menu {
+      font-size: 13px;
+      background-color: white;
+    }
+
+    .text-filter {
+      position: relative;
+      .clear-btn {
+        position: absolute;
+        left: 10px;
+        top: 11px;
+        display: inline-block;
+        cursor: pointer;
+        background-image: url('http://svgshare.com/i/sb.svg');
+        width: 15px;
+        height: 15px;
+        min-width: 15px;
+        min-height: 15px;
+      }
+
+      input {
+        font-family: Montserrat, sans-serif;
+        font-size:14px;
+        display:block;
+        background-color: rgba(0,0,0,0.02);
+        border: 1px solid #ccc;
+        border-radius: 2px;
+        box-sizing: border-box;
+        color: #333;
+        cursor: default;
+        outline: none;
+        padding: 8px 20px 8px 30px;
+      }
+    }
+  }
+
+  .hyo-table {
+    position: relative;
+    border: 1px solid rgba(0,0,0,.1);
+    border-bottom: none;
+    overflow: auto;
+    box-sizing: content-box;
+  }
+
+  .without-pagination {
+    border: 1px solid rgba(0,0,0,.1);
+  }
+
+  .hyo-thead {
+    box-sizing: border-box;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #e8e8e8;
+    border-bottom: 1px solid #e0e0e0;
+    .hyo-tr {
+      text-align: left;
+
+      .hyo-th {
+        position: absolute;
+        top: 0;
+        font-weight: bold;
+        vertical-align: middle;
+        text-transform: capitalize;
+        text-decoration: none;
+        padding: 0 10px;
+
+        .header-resizer {
+          position: absolute;
+          right: 0px;
+          width: 6px;
+          z-index: 1;
+        }
+
+        .header-resizer:hover {
+          cursor: ew-resize;
+        }
+
+        .header-resizer:hover .header-resizer-knob {
+          visibility: visible;
+        }
+
+        .header-resizer-knob {
+          position: absolute;
+          right: 0px;
+          visibility: hidden;
+          width: 4px;
+          background: #0284ff;
+        }
+
+        .th-content {
+          display: flex;
+          justify-content:center;
+          align-content:center;
+          flex-direction:column; /* column | row */
+          height: 100%;
+          padding: 7px 5px;
+        }
+
+        &.sortable {
+          cursor: pointer;
+        }
+        .sort {
+          float: right;
+          margin-top: 8px;
+        }
+        .sortup {
+          width: 0;
+          height: 0;
+          border-left: 5px solid transparent;
+          border-right: 5px solid transparent;
+          border-bottom: 5px solid black;
+          text-align: right;
+        }
+        .sortdown {
+          width: 0;
+          height: 0;
+          border-left: 5px solid transparent;
+          border-right: 5px solid transparent;
+          border-top: 5px solid black;
+          text-align: right;
+        }
+      }
+    }
+  }
+
+  .hyo-tbody {
+    position: absolute;
+
+    .hyo-tr {
+      overflow-y: visible;
+      position: relative;
+
+      .hyo-td {
+        display: flex;
+        justify-content:center;
+        align-content:center;
+        flex-direction:column; /* column | row */
+        position: absolute;
+        top: 0;
+        padding: 8px;
+        overflow-x: hidden;
+      }
+
+      .hyo-tr-background {
+        position: absolute;
+        border-bottom: 1px solid #e0e0e0;
+      }
+    }
+
+  }
+
+  .hyo-th, .hyo-td {
+    box-sizing: border-box;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    border-right: 1px solid #e0e0e0;
+    border-bottom: 0;
+  }
+
+  .hyo-paginate {
+    border: 1px solid rgba(0,0,0,.1);
+    border-top: 1px solid rgba(0,0,0,.15);
+    border-bottom-left-radius: .4em;
+    border-bottom-right-radius: .4em;
+    .pagination-wrapper {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 5px;
+      box-shadow: 0 -2px 15px 0 rgba(0,0,0,.15);
+
+      .pagination-loader {
+        padding: 2px;
+      }
+
+      .navigator {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-right: 15px;
+        input {
+          font-family: Montserrat, sans-serif;
+          font-size: 14px;
+          height: 20px;
+          text-indent: 4px;
+          border-radius: 5px;
+          box-shadow: inset 0 1px 2px rgba(0,0,0, .55), 0px 1px 1px rgba(255,255,255,.5);
+          border: 1px solid #666;
+          width: 30px;
+        }
+        button {
+          background: rgba(0,0,0,.03);
+          margin: 0 5px;
+          float: left;
+          line-height: 12px;
+          border: 1px solid #ddd;
+          box-shadow: 2px 2px 2px #888888;
+          border-radius: .4em;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}
