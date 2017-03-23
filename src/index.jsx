@@ -8,6 +8,7 @@ import ColumnResizer from './resizeHandler';
 import HeaderCell from './headerCell';
 import WidthHelper from './helpers/sizeHelper';
 import ResizeSensor from './helpers/resizeSensor';
+import EventListener from './helpers/eventListener';
 
 export default class Table extends Component {
   constructor(props) {
@@ -23,7 +24,10 @@ export default class Table extends Component {
       columnResizingData: {},
     };
     this.updateWidth = this.updateWidth.bind(this);
-    this.onResize = this.onResize.bind(this);
+    this.initializeWidth = this.initializeWidth.bind(this);
+    this.onResizeWidth = this.onResizeWidth.bind(this);
+    this.updateHeight = this.updateHeight.bind(this);
+    this.onResizeHeight = this.onResizeHeight.bind(this);
   }
 
   componentWillMount() {
@@ -34,7 +38,17 @@ export default class Table extends Component {
     if (this.props.width === "auto") {
       const parentNode = ReactDOM.findDOMNode(this.table).parentNode;
       this.initializeWidth(parentNode);
-      this.resizeSensor = new ResizeSensor(parentNode, () => this.onResize(parentNode));
+      this.resizeSensor = new ResizeSensor(parentNode, this.onResizeWidth);
+    }
+    if (this.props.height === "auto") {
+      const win = window;
+      this.updateHeight(win);
+
+      this.eventResizeWidthToken = EventListener.listen(
+        win,
+        'resize',
+        this.onResizeHeight,
+      );
     }
   }
 
@@ -51,19 +65,29 @@ export default class Table extends Component {
     }
   }
 
-  onResize(domNode) {
-    clearTimeout(this.updateTimer);
-    this.updateTimer = setTimeout(() => this.updateWidth(domNode), 16);
-  }
-
-  updateWidth(domNode) {
-    if (domNode) {
-      const newWidth = (domNode.clientWidth - 20);
-      this.setState({ width: newWidth });
+  componentWillUnmount() {
+    if (this.eventResizeWidthToken) {
+      this.eventResizeWidthToken.remove();
+      this.eventResizeWidthToken = null;
+    }
+    if (this.resizeSensor) {
+      this.resizeSensor.detach();
+      this.resizeSensor = null;
     }
   }
 
-  initializeWidth(domNode) {
+  onResizeWidth() {
+    clearTimeout(this.updateTimer);
+    this.updateTimer = setTimeout(this.updateWidth, 16);
+  }
+
+  onResizeHeight() {
+    clearTimeout(this.updateTimer);
+    this.updateTimer = setTimeout(this.updateHeight, 16);
+  }
+
+  initializeWidth() {
+    const domNode = ReactDOM.findDOMNode(this.table).parentNode;
     if (domNode) {
       const newWidth = (domNode.clientWidth - 20);
       const cols = WidthHelper.adjustColWidths(this.props.def, newWidth);
@@ -71,6 +95,21 @@ export default class Table extends Component {
     }
   }
 
+  updateWidth() {
+    if (this.table) {
+      const domNode = ReactDOM.findDOMNode(this.table).parentNode;
+      const newWidth = (domNode.clientWidth - 20);
+      this.setState({ width: newWidth });
+    }
+  }
+
+  updateHeight() {
+    const win = window;
+    if (win) {
+      const newHeight = (win.innerHeight- 50);
+      this.setState({ height: newHeight });
+    }
+  }
 
   /**
    * initializeStates initializes the states with given props.
@@ -169,7 +208,7 @@ export default class Table extends Component {
               case 'select':
                 // If it is a select filter, must match the whole keyword
                 if (keyword === "") return true;
-                else return cell.toString() === keyword;
+                else return cell && cell.toString() === keyword;
               default:
                 return cell && cell.toString().toLowerCase().includes(keyword.toLowerCase());
             }
