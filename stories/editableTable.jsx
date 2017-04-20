@@ -160,7 +160,7 @@ class EditableTable extends Component {
         rowHeight={35}
         headerHeight={35}
         height={250}
-        width={this.state.width}
+        width="auto"
         filterable
         pagination
         pageSize={10}

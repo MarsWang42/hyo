@@ -11,4 +11,4 @@ const data = [
   { name: "Tony", gender: "Male" },
 ];
 
-export default () => <Table def={def} data={data} />;
+export default () => <Table def={def} data={data} width="auto" />;

@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import ReactDOM from 'react-dom';
 import cn from 'classnames';
 import Dropdown from './dropdown';
 import InlineEdit from './inlineEdit';
@@ -6,6 +7,8 @@ import Spinner from './spinner';
 import ColumnResizer from './resizeHandler';
 import HeaderCell from './headerCell';
 import WidthHelper from './helpers/sizeHelper';
+import ResizeSensor from './helpers/resizeSensor';
+import EventListener from './helpers/eventListener';
 
 export default class Table extends Component {
   constructor(props) {
@@ -20,10 +23,33 @@ export default class Table extends Component {
       filters: [],
       columnResizingData: {},
     };
+    this.updateWidth = this.updateWidth.bind(this);
+    this.initializeWidth = this.initializeWidth.bind(this);
+    this.onResizeWidth = this.onResizeWidth.bind(this);
+    this.updateHeight = this.updateHeight.bind(this);
+    this.onResizeHeight = this.onResizeHeight.bind(this);
   }
 
   componentWillMount() {
     this.initializeStates(this.props);
+  }
+
+  componentDidMount() {
+    if (this.props.width === "auto") {
+      const parentNode = ReactDOM.findDOMNode(this.table).parentNode;
+      this.initializeWidth(parentNode);
+      this.resizeSensor = new ResizeSensor(parentNode, this.onResizeWidth);
+    }
+    if (this.props.height === "auto") {
+      const win = window;
+      this.updateHeight(win);
+
+      this.eventResizeWidthToken = EventListener.listen(
+        win,
+        'resize',
+        this.onResizeHeight,
+      );
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -39,6 +65,52 @@ export default class Table extends Component {
     }
   }
 
+  componentWillUnmount() {
+    if (this.eventResizeWidthToken) {
+      this.eventResizeWidthToken.remove();
+      this.eventResizeWidthToken = null;
+    }
+    if (this.resizeSensor) {
+      this.resizeSensor.detach();
+      this.resizeSensor = null;
+    }
+  }
+
+  onResizeWidth() {
+    clearTimeout(this.updateTimer);
+    this.updateTimer = setTimeout(this.updateWidth, 16);
+  }
+
+  onResizeHeight() {
+    clearTimeout(this.updateTimer);
+    this.updateTimer = setTimeout(this.updateHeight, 16);
+  }
+
+  initializeWidth() {
+    const domNode = ReactDOM.findDOMNode(this.table).parentNode;
+    if (domNode) {
+      const newWidth = (domNode.clientWidth - 20);
+      const cols = WidthHelper.adjustColWidths(this.props.def, newWidth);
+      this.setState({ width: newWidth, cols });
+    }
+  }
+
+  updateWidth() {
+    if (this.table) {
+      const domNode = ReactDOM.findDOMNode(this.table).parentNode;
+      const newWidth = (domNode.clientWidth - 20);
+      this.setState({ width: newWidth });
+    }
+  }
+
+  updateHeight() {
+    const win = window;
+    if (win) {
+      const newHeight = (win.innerHeight- 50);
+      this.setState({ height: newHeight });
+    }
+  }
+
   /**
    * initializeStates initializes the states with given props.
    */
@@ -48,11 +120,12 @@ export default class Table extends Component {
       pageSize,
       pagination,
       def,
-      width,
       height,
       rowHeight,
       headerHeight,
     } = props;
+    let { width } = props;
+    if (width === "auto") width = 100000;
 
     const cols = WidthHelper.adjustColWidths(def, width);
     const pages = pagination? Math.floor(data.length / pageSize)-1 : 0;
@@ -66,6 +139,7 @@ export default class Table extends Component {
       pages,
       cols,
       height: newHeight,
+      width,
     });
   }
 
@@ -134,7 +208,7 @@ export default class Table extends Component {
               case 'select':
                 // If it is a select filter, must match the whole keyword
                 if (keyword === "") return true;
-                else return cell.toString() === keyword;
+                else return cell && cell.toString() === keyword;
               default:
                 return cell && cell.toString().toLowerCase().includes(keyword.toLowerCase());
             }
@@ -185,6 +259,7 @@ export default class Table extends Component {
       cols,
       columnResizingData,
       isColumnResizing,
+      width,
     } = this.state;
 
     const {
@@ -196,7 +271,6 @@ export default class Table extends Component {
       loader,
       rowHeight,
       headerHeight,
-      width,
     } = this.props;
 
     const sortColumn = (col) => {
@@ -594,7 +668,7 @@ export default class Table extends Component {
         "without-pagination": !pagination,
       });
       return (
-        <div className="hyo">
+        <div className="hyo" ref={(table) => { this.table = table; }}>
           { filterable && renderFilter() }
           <div className={tableClass} style={style}>
             { renderHeaders() }
@@ -628,7 +702,7 @@ Table.propTypes = {
   height: PropTypes.number,
   rowHeight: PropTypes.number,
   headerHeight: PropTypes.number,
-  width: PropTypes.number,
+  width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 
 Table.defaultProps = {

@@ -24,7 +24,7 @@ const HeaderCell = ({
       </div>
     );
     return (
-      <div>
+      <div style={{height: "100%"}}>
         { headerResizer }
         <div className="th-content">
           { value }
