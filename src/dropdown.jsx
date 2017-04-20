@@ -23,12 +23,12 @@ export default class Dropdown extends Component {
    */
   componentDidMount() {
     this.eventClickToken = EventListener.listen(
-      document,
+      document.body,
       'click',
       this.hideDropdown,
     );
     this.eventTouchendToken = EventListener.listen(
-      document,
+      document.body,
       'touchend',
       this.hideDropdown,
     );

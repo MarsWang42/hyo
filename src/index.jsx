@@ -4,6 +4,7 @@ import cn from 'classnames';
 import Dropdown from './dropdown';
 import InlineEdit from './inlineEdit';
 import Spinner from './spinner';
+import Scrollbar from './scrollbar';
 import ColumnResizer from './resizeHandler';
 import HeaderCell from './headerCell';
 import WidthHelper from './helpers/sizeHelper';

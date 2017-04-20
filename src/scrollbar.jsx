@@ -343,7 +343,7 @@ export default class Scrollbar extends Component {
       return null;
     }
     const { isHorizontal, isActive, faceSize } = this.state;
-    const { size, isOpaque, verticalTop } = this.props;
+    const { size, isOpaque } = this.props;
     const isVertical = !isHorizontal;
     const verticalTop = this.props.verticalTop || 0;
     const position = this.state.position * this.state.scale + FACE_MARGIN;
