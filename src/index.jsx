@@ -9,7 +9,10 @@ import ColumnResizer from './resizeHandler';
 import HeaderCell from './headerCell';
 import WidthHelper from './helpers/sizeHelper';
 import ResizeSensor from './helpers/resizeSensor';
+import WheelHandler from './helpers/wheelHandler';
 import EventListener from './helpers/eventListener';
+import ScrollHelper from './helpers/scrollHelper';
+import translateDOMPositionXY from './helpers/translateDOMPositionXY';
 
 export default class Table extends Component {
   constructor(props) {
@@ -29,9 +32,19 @@ export default class Table extends Component {
     this.onResizeWidth = this.onResizeWidth.bind(this);
     this.updateHeight = this.updateHeight.bind(this);
     this.onResizeHeight = this.onResizeHeight.bind(this);
+    this.onWheel = this.onWheel.bind(this);
+    this.onVerticalScroll = this.onVerticalScroll.bind(this);
+    this.shouldHandleWheelX = this.shouldHandleWheelX.bind(this);
+    this.shouldHandleWheelY = this.shouldHandleWheelY.bind(this);
   }
 
   componentWillMount() {
+    this.wheelHandler = new WheelHandler(
+      this.onWheel,
+      this.shouldHandleWheelX,
+      this.shouldHandleWheelY,
+    );
+
     this.initializeStates(this.props);
   }
 
@@ -112,6 +125,74 @@ export default class Table extends Component {
     }
   }
 
+  shouldHandleWheelX(delta) {
+    delta = Math.round(delta);
+    if (delta === 0) {
+      return false;
+    }
+
+    return (
+      (delta < 0 && this.state.scrollX > 0) ||
+      (delta >= 0 && this.state.scrollX < this.state.maxScrollX)
+    );
+  }
+
+  shouldHandleWheelY(delta) {
+    delta = Math.round(delta);
+    if (delta === 0) {
+      return false;
+    }
+
+    return (
+      (delta < 0 && this.state.scrollY > 0) ||
+      (delta >= 0 && this.state.scrollY < this.state.maxScrollY)
+    );
+  }
+
+  onWheel(deltaX, deltaY) {
+    if (!this.isScrolling) this.isScrolling = true;
+    let x = this.state.scrollX;
+    if (Math.abs(deltaY) > Math.abs(deltaX)) {
+      const scrollState = this.scrollHelper.scrollBy(Math.round(deltaY));
+      const maxScrollY = Math.max(
+        0,
+        scrollState.contentHeight - this.state.height + this.props.headerHeight,
+      );
+      this.setState({
+        firstRowIndex: scrollState.index,
+        firstRowOffset: scrollState.offset,
+        scrollY: scrollState.position,
+        scrollContentHeight: scrollState.contentHeight,
+        maxScrollY,
+      });
+    } else if (deltaX) {
+      x += deltaX;
+      x = x < 0 ? 0 : x;
+      x = x > this.state.maxScrollX ? this.state.maxScrollX : x;
+      this.setState({
+        scrollX: x,
+      });
+    }
+
+    this.isScrolling = false;
+  }
+
+  onVerticalScroll(scrollPos) {
+    if (scrollPos !== this.state.scrollY) {
+      if (!this.isScrolling) {
+        this.isScrolling = true;
+      }
+      const scrollState = this.scrollHelper.scrollTo(Math.round(scrollPos));
+      this.setState({
+        firstRowIndex: scrollState.index,
+        firstRowOffset: scrollState.offset,
+        scrollY: scrollState.position,
+        scrollContentHeight: scrollState.contentHeight,
+      });
+      this.isScrolling = false;
+    }
+  }
+
   /**
    * initializeStates initializes the states with given props.
    */
@@ -134,6 +215,18 @@ export default class Table extends Component {
     const rowNum = pagination ? pageSize : data.length;
     const newHeight = Math.min(height, (rowHeight * rowNum) + headerHeight);
 
+    this.scrollHelper = new ScrollHelper(
+      pageSize,
+      rowHeight,
+      newHeight - headerHeight,
+    );
+
+    const scrollState = this.scrollHelper.scrollTo(0);
+    const firstRowIndex = scrollState.index;
+    const firstRowOffset = scrollState.offset;
+    const scrollY = scrollState.position;
+    const maxScrollY = rowHeight * pageSize - newHeight + headerHeight;
+
     this.setState({
       pageRows,
       resolvedRows: data,
@@ -141,6 +234,10 @@ export default class Table extends Component {
       cols,
       height: newHeight,
       width,
+      firstRowIndex,
+      firstRowOffset,
+      scrollY,
+      maxScrollY,
     });
   }
 
@@ -261,6 +358,7 @@ export default class Table extends Component {
       columnResizingData,
       isColumnResizing,
       width,
+      scrollY,
     } = this.state;
 
     const {
@@ -281,7 +379,8 @@ export default class Table extends Component {
           size={height - headerHeight}
           contentSize={rowHeight * pageSize}
           verticalTop={headerHeight}
-          onScroll={function(){}}
+          position={scrollY}
+          onScroll={this.onVerticalScroll}
         />;
     }
 
@@ -629,6 +728,9 @@ export default class Table extends Component {
      */
     const renderRows = () => {
       let currentRowPosition = 0;
+      let rowsStyle = { top: headerHeight };
+
+      translateDOMPositionXY(rowsStyle, 0, -this.state.scrollY);
       const rows = pageRows.map((row, i) => {
         let currentCellPosition = 0;
         const cell = cols.map((col, j) => {
@@ -660,7 +762,7 @@ export default class Table extends Component {
         return currentRow;
       });
       return (
-        <div className="hyo-tbody" style={{ top: headerHeight }}>
+        <div className="hyo-tbody" style={rowsStyle}>
           {!isLoading && rows }
         </div>
       );
@@ -683,7 +785,7 @@ export default class Table extends Component {
         <div className="hyo" ref={(table) => { this.table = table; }}>
           { filterable && renderFilter() }
         <div className="hyo-table-layout">
-            <div className={tableClass} style={style}>
+            <div className={tableClass} style={style} onWheel={this.wheelHandler.onWheel}>
               { renderHeaders() }
               { renderRows() }
               { isLoading && shownLoader }
@@ -694,7 +796,6 @@ export default class Table extends Component {
         </div>
       );
     };
-    console.log(verticalScrollbar)
 
     return renderTable();
   }

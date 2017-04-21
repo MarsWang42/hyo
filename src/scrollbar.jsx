@@ -3,8 +3,7 @@ import ReactDOM from 'react-dom';
 import cn from 'classnames';
 import MouseTracker from './helpers/mouseTracker';
 import WheelHandler from './helpers/wheelHandler';
-import BrowserSupportCore from './helpers/browserSupportCore';
-import getVendorPrefixedName from './helpers/getVendorPrefixedName';
+import translateDOMPositionXY from './helpers/translateDOMPositionXY';
 
 const KEY = {
   SPACE: 32,
@@ -22,38 +21,10 @@ const KEY = {
 // last is this component or not.
 let lastScrolledScrollbar = null;
 
-const FACE_MARGIN = 6;
+const FACE_MARGIN = 10;
 const FACE_MARGIN_2 = FACE_MARGIN * 2;
 const FACE_SIZE_MIN = 30;
 const KEYBOARD_SCROLL_AMOUNT = 40;
-const TRANSFORM = getVendorPrefixedName('transform');
-const BACKFACE_VISIBILITY = getVendorPrefixedName('backfaceVisibility');
-
-const translateDOMPositionXY = (function () {
-  if (BrowserSupportCore.hasCSSTransforms()) {
-    const ua = global.window ? global.window.navigator.userAgent : 'UNKNOWN';
-    const isSafari = (/Safari\//).test(ua) && !(/Chrome\//).test(ua);
-    // It appears that Safari messes up the composition order
-    // of GPU-accelerated layers
-    // (see bug https://bugs.webkit.org/show_bug.cgi?id=61824).
-    // Use 2D translation instead.
-    if (!isSafari && BrowserSupportCore.hasCSS3DTransforms()) {
-      return function (style, x, y) {
-        style[TRANSFORM] = `translate3d(${x}px, ${y}px, 0)`;
-        style[BACKFACE_VISIBILITY] = 'hidden';
-      };
-    } else {
-      return function (style, x, y) {
-        style[TRANSFORM] = `translate(${x}px, ${y}px)`;
-      };
-    }
-  } else {
-    return function (style, x, y) {
-      style.left = `${x}px`;
-      style.top = `${y}px`;
-    };
-  }
-}());
 
 export default class Scrollbar extends Component {
   constructor(props) {
@@ -108,6 +79,30 @@ export default class Scrollbar extends Component {
       lastScrolledScrollbar = null;
     }
     delete this.mouseMoveTracker;
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const controlledPosition = nextProps.position;
+    if (controlledPosition === undefined) {
+      this.setNextState(
+        this.calculateState(
+          this.state.position,
+          nextProps.size,
+          nextProps.contentSize,
+          nextProps.orientation
+        )
+      );
+    } else {
+      this.setNextState(
+        this.calculateState(
+          controlledPosition,
+          nextProps.size,
+          nextProps.contentSize,
+          nextProps.orientation
+        ),
+        nextProps,
+      );
+    }
   }
 
   // These methods are used to handle the wheel events.
@@ -386,11 +381,11 @@ export default class Scrollbar extends Component {
     if (!this.state.scrollable) {
       return null;
     }
-    const { isHorizontal, isActive, faceSize } = this.state;
+    const { isHorizontal, isActive, faceSize, scale } = this.state;
     const { size, isOpaque, zIndex } = this.props;
     const isVertical = !isHorizontal;
     const verticalTop = this.props.verticalTop || 0;
-    const position = this.state.position * this.state.scale + FACE_MARGIN;
+    const position = this.state.position * scale + FACE_MARGIN;
 
     let mainStyle;
     let faceStyle;
