@@ -644,7 +644,7 @@ export default class Table extends Component {
         height: headerHeight,
       };
 
-      translateDOMPositionXY(theadStyle, -scrollX);
+      translateDOMPositionXY(theadStyle, -scrollX, 0);
 
       const headers = cols.map((col, i) => {
         const thClassName = cn({
