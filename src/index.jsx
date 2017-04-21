@@ -486,10 +486,13 @@ export default class Table extends Component {
         if (col.key !== colKey) return col;
         else return newCol;
       });
+      const maxScrollX = WidthHelper.getHeaderWidth(newCols, this.state.width)
+        - this.state.width;
 
       this.setState({
         cols: newCols,
         columnResizingData: {},
+        maxScrollX,
         isColumnResizing: false,
       });
     };
@@ -646,6 +649,8 @@ export default class Table extends Component {
         width: contentWidth,
         height: headerHeight,
       };
+
+      translateDOMPositionXY(theadStyle, -scrollX, -scrollY);
 
       const headers = cols.map((col, i) => {
         const thClassName = cn({
