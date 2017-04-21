@@ -391,17 +391,11 @@ export default class Table extends Component {
       const innerContainerStyle = {
         width,
       };
-      // translateDOMPositionXY(
-      //   innerContainerStyle,
-      //   0,
-      //   this.props.offset
-      // );
       horizontalScrollbar = (
         <div style={innerContainerStyle} className="horizontal-scrollbar-container">
           <Scrollbar
             size={width}
             contentSize={contentWidth}
-            isOpaque={true}
             orientation="horizontal"
             position={scrollX}
             onScroll={this.onHorizontalScroll}
@@ -650,7 +644,7 @@ export default class Table extends Component {
         height: headerHeight,
       };
 
-      translateDOMPositionXY(theadStyle, -scrollX, -scrollY);
+      translateDOMPositionXY(theadStyle, -scrollX);
 
       const headers = cols.map((col, i) => {
         const thClassName = cn({

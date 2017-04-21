@@ -5,7 +5,7 @@ import FilterableTable from './filterableTable';
 import BigTable from './bigTable';
 import PaginationTable from './paginationTable';
 import EditableTable from './editableTable';
-import '../src/style.scss';
+import '../src/styleProcore.scss';
 
 
 storiesOf('Hyo Tables', module)

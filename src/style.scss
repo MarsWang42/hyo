@@ -266,10 +266,8 @@ $loader-yellow: #f9c922;
 .horizontal-scrollbar-container {
   height: 15px;
   overflow: hidden;
-  border-left: 1px solid rgba(0,0,0,.1);
-  border-right: 1px solid rgba(0,0,0,.1);
-  border-top: 1px solid rgba(0,0,0,.05);
-  border-bottom: 1px solid rgba(0,0,0,.05);
+  position: absolute;
+  bottom: 0;
 }
 
 .ScrollbarLayout-main {
@@ -328,7 +326,7 @@ $loader-yellow: #f9c922;
 }
 
 .public-Scrollbar-face:after {
-  background-color: #c2c2c2;
+  background-color: #d0d0d0;
 }
 
 .public-Scrollbar-main:hover .public-Scrollbar-face:after,

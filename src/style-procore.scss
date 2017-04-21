@@ -10,10 +10,8 @@ $breakpoint-alpha: 480px;
 }
 
 .Dropdown-control {
-  font-family: Lato,sans-serif,sans-serif;
-  font-size: 12px;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+  font-family: Montserrat, sans-serif;
+  font-size: 14px;
   position: relative;
   overflow: hidden;
   background-color: rgba(0,0,0,0.02);
@@ -51,7 +49,7 @@ $breakpoint-alpha: 480px;
   .remove-btn {
     position: absolute;
     left: 10px;
-    top: 7px;
+    top: 11px;
     display: inline-block;
     cursor: pointer;
     background-image: url('http://svgshare.com/i/sb.svg');
@@ -87,10 +85,8 @@ $breakpoint-alpha: 480px;
 }
 
 .Dropdown-menu {
-  font-family: Lato,sans-serif,sans-serif;
-  font-size: 12px;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+  font-family: Montserrat, sans-serif;
+  font-size:14px;
   display: flex;
   flex-direction: column;
   background-color: white;
@@ -176,7 +172,7 @@ $breakpoint-alpha: 480px;
 .inline-edit-input {
   box-sizing: border-box;
   width: 100%;
-  font-size: 12px;
+  font-size: 14px;
   border-radius: 5px;
   border: 1px solid #ccc;
 }
@@ -264,14 +260,130 @@ $loader-yellow: #f9c922;
 }
 
 /*
+ * scrollbar edit style
+ */
+
+.horizontal-scrollbar-container {
+  height: 15px;
+  overflow: hidden;
+  position: absolute;
+  bottom: 0;
+}
+
+.scrollbarlayout-main {
+  box-sizing: border-box;
+  outline: none;
+  overflow: hidden;
+  position: absolute;
+  transition-duration: 250ms;
+  transition-timing-function: ease;
+  user-select: none;
+}
+
+.scrollbarlayout-mainvertical {
+  bottom: 0;
+  right: 20px;
+  top: 0;
+  transition-property: background-color width;
+  width: 14px;
+}
+
+.scrollbarlayout-mainvertical.public-scrollbar-mainactive,
+.scrollbarlayout-mainvertical:hover {
+  width: 15px;
+}
+
+.ScrollbarLayout-mainHorizontal {
+  position: absolute;
+  bottom: 0;
+  height: 14px;
+  left: 0;
+  transition-property: background-color height;
+}
+
+/* Touching the scroll-track directly makes the scroll-track bolder */
+.ScrollbarLayout-mainHorizontal.public-Scrollbar-mainActive,
+.ScrollbarLayout-mainHorizontal:hover {
+  height: 15px;
+}
+
+.ScrollbarLayout-face {
+  left: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: 1;
+}
+
+.public-Scrollbar-main.public-Scrollbar-mainActive,
+.public-Scrollbar-main:hover {
+  background-color: rgba(255,255,255,.8);
+}
+
+.public-Scrollbar-mainOpaque,
+.public-Scrollbar-mainOpaque.public-Scrollbar-mainActive,
+.public-Scrollbar-mainOpaque:hover {
+  background-color: rgba(255,255,255,.8);
+}
+
+.public-Scrollbar-face:after {
+  background-color: #d0d0d0;
+}
+
+.public-Scrollbar-main:hover .public-Scrollbar-face:after,
+.public-Scrollbar-mainActive .public-Scrollbar-face:after,
+.public-Scrollbar-faceActive:after {
+  background-color: #a2a2a2;
+}
+
+/**
+ * This selector renders the "nub" of the scrollface. The nub must
+ * be rendered as pseudo-element so that it won't receive any UI events then
+ * we can get the correct `event.offsetX` and `event.offsetY` from the
+ * scrollface element while dragging it.
+ */
+.ScrollbarLayout-face:after {
+  border-radius: 6px;
+  content: '';
+  display: block;
+  position: absolute;
+  transition: background-color 250ms ease;
+}
+
+.ScrollbarLayout-faceHorizontal {
+  bottom: 0;
+  left: 0;
+  top: 0;
+}
+
+.ScrollbarLayout-faceHorizontal:after {
+  bottom: 4px;
+  left: 0;
+  top: 4px;
+  width: 100%;
+}
+
+.ScrollbarLayout-faceVertical {
+  left: 0;
+  right: 0;
+  top: 0;
+}
+
+.ScrollbarLayout-faceVertical:after {
+  height: 100%;
+  left: 4px;
+  right: 4px;
+  top: 0;
+}
+
+/*
  * Hyo Table Button Style
  */
 .hyo {
-  font-family: Lato,sans-serif,sans-serif;
-  font-size: 11px;
+  font-family: Montserrat, sans-serif;
+  font-size: 16px;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  margin: 0;
+  margin: 1em 0;
   width: 100%;
   min-width: 300px;
 
@@ -286,18 +398,6 @@ $loader-yellow: #f9c922;
     .Dropdown-root, .text-filter{
       margin: 5px 15px;
       min-width: 160px;
-    }
-
-    .Dropdown-control {
-      border-color: #939393;
-      border-radius: 2px;
-      font-size: 13px;
-      background-color: white;
-    }
-
-    .Dropdown-menu {
-      font-size: 13px;
-      background-color: white;
     }
 
     .text-filter {
@@ -331,16 +431,23 @@ $loader-yellow: #f9c922;
     }
   }
 
+  .hyo-table-layout {
+    position: relative;
+  }
+
   .hyo-table {
     position: relative;
+    border-top-left-radius: .4em;
+    border-top-right-radius: .4em;
     border: 1px solid rgba(0,0,0,.1);
     border-bottom: none;
-    overflow: auto;
+    overflow: hidden;
     box-sizing: content-box;
   }
 
   .without-pagination {
     border: 1px solid rgba(0,0,0,.1);
+    border-radius: .4em;
   }
 
   .hyo-thead {
@@ -348,19 +455,19 @@ $loader-yellow: #f9c922;
     position: sticky;
     top: 0;
     z-index: 1;
-    background: #e8e8e8;
-    border-bottom: 1px solid #e0e0e0;
+    background: #f8f8f8;
+    border-bottom: 1px solid rgba(0,0,0,.15);
+    box-shadow: 0 2px 15px 0 rgba(0,0,0,.15);
+    border-top-left-radius: .4em;
+    border-top-right-radius: .4em;
     .hyo-tr {
-      text-align: left;
+      text-align: center;
 
       .hyo-th {
         position: absolute;
         top: 0;
-        font-weight: bold;
-        vertical-align: middle;
-        text-transform: capitalize;
-        text-decoration: none;
-        padding: 0 10px;
+        font-weight: normal;
+        border-right: 1px solid rgba(0,0,0,.05);
 
         .header-resizer {
           position: absolute;
@@ -386,11 +493,6 @@ $loader-yellow: #f9c922;
         }
 
         .th-content {
-          display: flex;
-          justify-content:center;
-          align-content:center;
-          flex-direction:column; /* column | row */
-          height: 100%;
           padding: 7px 5px;
         }
 
@@ -417,6 +519,9 @@ $loader-yellow: #f9c922;
           border-top: 5px solid black;
           text-align: right;
         }
+        &:last-child {
+          border-right:0;
+        }
       }
     }
   }
@@ -429,19 +534,20 @@ $loader-yellow: #f9c922;
       position: relative;
 
       .hyo-td {
-        display: flex;
-        justify-content:center;
-        align-content:center;
-        flex-direction:column; /* column | row */
         position: absolute;
         top: 0;
-        padding: 8px;
-        overflow-x: hidden;
+        border-right: 1px solid rgba(0,0,0,.02);
+        padding: 7px 5px;
+        &:last-child {
+          border-right:0
+        }
       }
 
       .hyo-tr-background {
         position: absolute;
-        border-bottom: 1px solid #e0e0e0;
+      }
+      .hyo-tr-highlighted {
+        background-color: rgba(0,0,0,.05)
       }
     }
 
@@ -451,8 +557,6 @@ $loader-yellow: #f9c922;
     box-sizing: border-box;
     white-space: nowrap;
     text-overflow: ellipsis;
-    border-right: 1px solid #e0e0e0;
-    border-bottom: 0;
   }
 
   .hyo-paginate {
