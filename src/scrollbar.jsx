@@ -301,6 +301,15 @@ export default class Scrollbar extends Component {
     });
   }
 
+  blur() {
+    try {
+      this.onBlur();
+      ReactDOM.findDOMNode(this).blur();
+    } catch (oops) {
+      // pass
+    }
+  }
+
   onKeyDown(event) {
     const keyCode = event.keyCode;
     const { size, contentSize, orientation } = this.props;

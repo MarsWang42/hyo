@@ -30,10 +30,9 @@ export default class Table extends Component {
     this.updateWidth = this.updateWidth.bind(this);
     this.initializeWidth = this.initializeWidth.bind(this);
     this.onResizeWidth = this.onResizeWidth.bind(this);
-    this.updateHeight = this.updateHeight.bind(this);
-    this.onResizeHeight = this.onResizeHeight.bind(this);
     this.onWheel = this.onWheel.bind(this);
     this.onVerticalScroll = this.onVerticalScroll.bind(this);
+    this.onHorizontalScroll = this.onHorizontalScroll.bind(this);
     this.shouldHandleWheelX = this.shouldHandleWheelX.bind(this);
     this.shouldHandleWheelY = this.shouldHandleWheelY.bind(this);
   }
@@ -53,16 +52,6 @@ export default class Table extends Component {
       const parentNode = ReactDOM.findDOMNode(this.table).parentNode;
       this.initializeWidth(parentNode);
       this.resizeSensor = new ResizeSensor(parentNode, this.onResizeWidth);
-    }
-    if (this.props.height === "auto") {
-      const win = window;
-      this.updateHeight(win);
-
-      this.eventResizeWidthToken = EventListener.listen(
-        win,
-        'resize',
-        this.onResizeHeight,
-      );
     }
   }
 
@@ -95,17 +84,14 @@ export default class Table extends Component {
     this.updateTimer = setTimeout(this.updateWidth, 16);
   }
 
-  onResizeHeight() {
-    clearTimeout(this.updateTimer);
-    this.updateTimer = setTimeout(this.updateHeight, 16);
-  }
-
   initializeWidth() {
     const domNode = ReactDOM.findDOMNode(this.table).parentNode;
     if (domNode) {
       const newWidth = (domNode.clientWidth - 20);
       const cols = WidthHelper.adjustColWidths(this.props.def, newWidth);
-      this.setState({ width: newWidth, cols });
+      const maxScrollX = WidthHelper.getHeaderWidth(cols, newWidth)
+        - newWidth;
+      this.setState({ width: newWidth, maxScrollX, cols });
     }
   }
 
@@ -113,15 +99,9 @@ export default class Table extends Component {
     if (this.table) {
       const domNode = ReactDOM.findDOMNode(this.table).parentNode;
       const newWidth = (domNode.clientWidth - 20);
-      this.setState({ width: newWidth });
-    }
-  }
-
-  updateHeight() {
-    const win = window;
-    if (win) {
-      const newHeight = (win.innerHeight- 50);
-      this.setState({ height: newHeight });
+      const maxScrollX = WidthHelper.getHeaderWidth(this.state.cols, newWidth)
+        - newWidth;
+      this.setState({ width: newWidth, maxScrollX });
     }
   }
 
@@ -193,6 +173,18 @@ export default class Table extends Component {
     }
   }
 
+  onHorizontalScroll(scrollPos) {
+    if (scrollPos !== this.state.scrollX) {
+      if (!this.isScrolling) {
+        this.isScrolling = true;
+      }
+      this.setState({
+        scrollX: scrollPos,
+      });
+      this.isScrolling = false;
+    }
+  }
+
   /**
    * initializeStates initializes the states with given props.
    */
@@ -202,12 +194,12 @@ export default class Table extends Component {
       pageSize,
       pagination,
       def,
-      height,
       rowHeight,
       headerHeight,
+      height,
     } = props;
     let { width } = props;
-    if (width === "auto") width = 999999999;
+    if (width === "auto") width = 100000;
 
     const cols = WidthHelper.adjustColWidths(def, width);
     const pages = pagination? Math.floor(data.length / pageSize)-1 : 0;
@@ -225,7 +217,9 @@ export default class Table extends Component {
     const firstRowIndex = scrollState.index;
     const firstRowOffset = scrollState.offset;
     const scrollY = scrollState.position;
+    const scrollX = 0;
     const maxScrollY = rowHeight * pageSize - newHeight + headerHeight;
+    const maxScrollX = WidthHelper.getHeaderWidth(cols, width) - width;
 
     this.setState({
       pageRows,
@@ -237,7 +231,9 @@ export default class Table extends Component {
       firstRowIndex,
       firstRowOffset,
       scrollY,
+      scrollX,
       maxScrollY,
+      maxScrollX,
     });
   }
 
@@ -258,10 +254,10 @@ export default class Table extends Component {
       filterable,
       pagination,
       pageSize,
-      height,
       rowHeight,
       headerHeight,
     } = this.props;
+    let { height } = this.state;
     let newResolvedRows = data;
     let updatedRows;
 
@@ -359,6 +355,9 @@ export default class Table extends Component {
       isColumnResizing,
       width,
       scrollY,
+      scrollX,
+      maxScrollX,
+      maxScrollY,
     } = this.state;
 
     const {
@@ -372,16 +371,44 @@ export default class Table extends Component {
       headerHeight,
     } = this.props;
 
+    const contentWidth = WidthHelper.getHeaderWidth(cols, width);
+
     let verticalScrollbar;
-    if (true) {
-      verticalScrollbar =
+    if (maxScrollY > 0) {
+      verticalScrollbar = (
         <Scrollbar
           size={height - headerHeight}
           contentSize={rowHeight * pageSize}
           verticalTop={headerHeight}
           position={scrollY}
           onScroll={this.onVerticalScroll}
-        />;
+        />
+      );
+    }
+
+    let horizontalScrollbar;
+    if (maxScrollX > 0) {
+      const innerContainerStyle = {
+        width,
+      };
+      // translateDOMPositionXY(
+      //   innerContainerStyle,
+      //   0,
+      //   this.props.offset
+      // );
+      horizontalScrollbar = (
+        <div style={innerContainerStyle} className="horizontal-scrollbar-container">
+          <Scrollbar
+            size={width}
+            contentSize={contentWidth}
+            isOpaque={true}
+            orientation="horizontal"
+            position={scrollX}
+            onScroll={this.onHorizontalScroll}
+            offset={undefined}
+          />
+        </div>
+      );
     }
 
     const sortColumn = (col) => {
@@ -616,7 +643,7 @@ export default class Table extends Component {
     const renderHeaders = () => {
       let currentPosition = 0;
       const theadStyle = {
-        width: WidthHelper.getHeaderWidth(cols, width),
+        width: contentWidth,
         height: headerHeight,
       };
 
@@ -730,7 +757,7 @@ export default class Table extends Component {
       let currentRowPosition = 0;
       let rowsStyle = { top: headerHeight };
 
-      translateDOMPositionXY(rowsStyle, 0, -this.state.scrollY);
+      translateDOMPositionXY(rowsStyle, -scrollX, -scrollY);
       const rows = pageRows.map((row, i) => {
         let currentCellPosition = 0;
         const cell = cols.map((col, j) => {
@@ -745,7 +772,7 @@ export default class Table extends Component {
         };
         const backgroundStyle = {
           height: rowHeight,
-          width: WidthHelper.getHeaderWidth(cols, width),
+          width: contentWidth,
         };
         const backgroundClassName = cn({
           "hyo-tr-background": true,
@@ -790,7 +817,8 @@ export default class Table extends Component {
               { renderRows() }
               { isLoading && shownLoader }
             </div>
-            {verticalScrollbar}
+            {!isLoading && verticalScrollbar}
+            {!isLoading && horizontalScrollbar}
           </div>
           { pagination && renderPagination() }
         </div>

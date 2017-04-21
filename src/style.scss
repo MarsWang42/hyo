@@ -263,6 +263,15 @@ $loader-yellow: #f9c922;
  * Scrollbar Edit Style
  */
 
+.horizontal-scrollbar-container {
+  height: 15px;
+  overflow: hidden;
+  border-left: 1px solid rgba(0,0,0,.1);
+  border-right: 1px solid rgba(0,0,0,.1);
+  border-top: 1px solid rgba(0,0,0,.05);
+  border-bottom: 1px solid rgba(0,0,0,.05);
+}
+
 .ScrollbarLayout-main {
   box-sizing: border-box;
   outline: none;
@@ -278,17 +287,18 @@ $loader-yellow: #f9c922;
   right: 20px;
   top: 0;
   transition-property: background-color width;
-  width: 15px;
+  width: 14px;
 }
 
 .ScrollbarLayout-mainVertical.public-Scrollbar-mainActive,
 .ScrollbarLayout-mainVertical:hover {
-  width: 18px;
+  width: 15px;
 }
 
 .ScrollbarLayout-mainHorizontal {
+  position: absolute;
   bottom: 0;
-  height: 15px;
+  height: 14px;
   left: 0;
   transition-property: background-color height;
 }
@@ -296,7 +306,7 @@ $loader-yellow: #f9c922;
 /* Touching the scroll-track directly makes the scroll-track bolder */
 .ScrollbarLayout-mainHorizontal.public-Scrollbar-mainActive,
 .ScrollbarLayout-mainHorizontal:hover {
-  height: 18px;
+  height: 15px;
 }
 
 .ScrollbarLayout-face {
