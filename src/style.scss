@@ -275,20 +275,20 @@ $loader-yellow: #f9c922;
 
 .ScrollbarLayout-mainVertical {
   bottom: 0;
-  right: 0;
+  right: 20px;
   top: 0;
   transition-property: background-color width;
-  width: var(scrollbar-size);
+  width: 15px;
 }
 
 .ScrollbarLayout-mainVertical.public-Scrollbar-mainActive,
 .ScrollbarLayout-mainVertical:hover {
-  width: var(scrollbar-size-large);
+  width: 18px;
 }
 
 .ScrollbarLayout-mainHorizontal {
   bottom: 0;
-  height: var(scrollbar-size);
+  height: 15px;
   left: 0;
   transition-property: background-color height;
 }
@@ -296,7 +296,7 @@ $loader-yellow: #f9c922;
 /* Touching the scroll-track directly makes the scroll-track bolder */
 .ScrollbarLayout-mainHorizontal.public-Scrollbar-mainActive,
 .ScrollbarLayout-mainHorizontal:hover {
-  height: var(scrollbar-size-large);
+  height: 18px;
 }
 
 .ScrollbarLayout-face {
@@ -308,23 +308,23 @@ $loader-yellow: #f9c922;
 
 .public-Scrollbar-main.public-Scrollbar-mainActive,
 .public-Scrollbar-main:hover {
-  background-color: var(scrollbar-track-color);
+  background-color: rgba(255,255,255,.8);
 }
 
 .public-Scrollbar-mainOpaque,
 .public-Scrollbar-mainOpaque.public-Scrollbar-mainActive,
 .public-Scrollbar-mainOpaque:hover {
-  background-color: var(fbui-white);
+  background-color: rgba(255,255,255,.8);
 }
 
 .public-Scrollbar-face:after {
-  background-color: var(scrollbar-face-color);
+  background-color: #c2c2c2;
 }
 
 .public-Scrollbar-main:hover .public-Scrollbar-face:after,
 .public-Scrollbar-mainActive .public-Scrollbar-face:after,
 .public-Scrollbar-faceActive:after {
-  background-color: var(scrollbar-face-active-color);
+  background-color: #a2a2a2;
 }
 
 /**
@@ -334,7 +334,7 @@ $loader-yellow: #f9c922;
  * scrollface element while dragging it.
  */
 .ScrollbarLayout-face:after {
-  border-radius: var(scrollbar-face-radius);
+  border-radius: 6px;
   content: '';
   display: block;
   position: absolute;
@@ -348,9 +348,9 @@ $loader-yellow: #f9c922;
 }
 
 .ScrollbarLayout-faceHorizontal:after {
-  bottom: var(scrollbar-face-margin);
+  bottom: 4px;
   left: 0;
-  top: var(scrollbar-face-margin);
+  top: 4px;
   width: 100%;
 }
 
@@ -362,8 +362,8 @@ $loader-yellow: #f9c922;
 
 .ScrollbarLayout-faceVertical:after {
   height: 100%;
-  left: var(scrollbar-face-margin);
-  right: var(scrollbar-face-margin);
+  left: 4px;
+  right: 4px;
   top: 0;
 }
 
@@ -423,13 +423,17 @@ $loader-yellow: #f9c922;
     }
   }
 
+  .hyo-table-layout {
+    position: relative;
+  }
+
   .hyo-table {
     position: relative;
     border-top-left-radius: .4em;
     border-top-right-radius: .4em;
     border: 1px solid rgba(0,0,0,.1);
     border-bottom: none;
-    overflow: auto;
+    overflow: hidden;
     box-sizing: content-box;
   }
 

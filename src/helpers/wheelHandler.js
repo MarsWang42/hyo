@@ -23,9 +23,9 @@ export default class WheelHandler {
     this.deltaY = 0;
     this.didWheel = this.didWheel.bind(this);
 
-    this.handleScrollX = handleScrollX;
-    this.handleScrollY = handleScrollY;
-    this.stopPropagation = stopPropagation;
+    this.handleScrollX = handleScrollX || function() {};
+    this.handleScrollY = handleScrollY || function() {};
+    this.stopPropagation = stopPropagation || function() {};
     this.onWheelCallback = onWheel;
     this.onWheel = this.onWheel.bind(this);
   }

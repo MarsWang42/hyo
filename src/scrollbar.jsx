@@ -22,7 +22,7 @@ const KEY = {
 // last is this component or not.
 let lastScrolledScrollbar = null;
 
-const FACE_MARGIN = 10;
+const FACE_MARGIN = 6;
 const FACE_MARGIN_2 = FACE_MARGIN * 2;
 const FACE_SIZE_MIN = 30;
 const KEYBOARD_SCROLL_AMOUNT = 40;
@@ -61,7 +61,20 @@ export default class Scrollbar extends Component {
     this.onFocus = this.onFocus.bind(this);
     this.onBlur = this.onBlur.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
-    this.state = {};
+    this.state = this.calculateState(
+      props.position || props.defaultPosition || 0,
+      props.size,
+      props.contentSize,
+      props.orientation
+    );
+    this.shouldHandleX = this.shouldHandleX.bind(this);
+    this.shouldHandleY = this.shouldHandleY.bind(this);
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onMouseMove = this.onMouseMove.bind(this);
+    this.onMouseMoveEnd = this.onMouseMoveEnd.bind(this);
+    this.onWheel = this.onWheel.bind(this);
+    this.onWheelX = this.onWheelX.bind(this);
+    this.onWheelY = this.onWheelY.bind(this);
   }
 
   componentWillMount() {
@@ -234,7 +247,7 @@ export default class Scrollbar extends Component {
     }
 
     const isDragging = this.mouseMoveTracker ?
-      this.mouseMoveTracker.isDragging() :
+      this.mouseMoveTracker.isDragging :
       false;
 
     const state = {

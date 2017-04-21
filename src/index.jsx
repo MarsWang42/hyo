@@ -274,6 +274,17 @@ export default class Table extends Component {
       headerHeight,
     } = this.props;
 
+    let verticalScrollbar;
+    if (true) {
+      verticalScrollbar =
+        <Scrollbar
+          size={height - headerHeight}
+          contentSize={rowHeight * pageSize}
+          verticalTop={headerHeight}
+          onScroll={function(){}}
+        />;
+    }
+
     const sortColumn = (col) => {
       if (col.sortable) {
         const dr = col.key !== sortingCol.key ? 'asc' :
@@ -655,16 +666,6 @@ export default class Table extends Component {
       );
     };
 
-    let verticalScrollbar;
-    if (true) {
-      verticalScrollbar =
-        <Scrollbar
-          size={10}
-          contentSize={500}
-          verticalTop={0}
-        />;
-    }
-
     /**
      * renderTable generates the whole table.
      */
@@ -681,10 +682,12 @@ export default class Table extends Component {
       return (
         <div className="hyo" ref={(table) => { this.table = table; }}>
           { filterable && renderFilter() }
-          <div className={tableClass} style={style}>
-            { renderHeaders() }
-            { renderRows() }
-            { isLoading && shownLoader }
+        <div className="hyo-table-layout">
+            <div className={tableClass} style={style}>
+              { renderHeaders() }
+              { renderRows() }
+              { isLoading && shownLoader }
+            </div>
             {verticalScrollbar}
           </div>
           { pagination && renderPagination() }
