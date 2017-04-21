@@ -126,7 +126,7 @@ export default class Table extends Component {
       headerHeight,
     } = props;
     let { width } = props;
-    if (width === "auto") width = 100000;
+    if (width === "auto") width = 999999999;
 
     const cols = WidthHelper.adjustColWidths(def, width);
     const pages = pagination? Math.floor(data.length / pageSize)-1 : 0;
@@ -655,6 +655,16 @@ export default class Table extends Component {
       );
     };
 
+    let verticalScrollbar;
+    if (true) {
+      verticalScrollbar =
+        <Scrollbar
+          size={10}
+          contentSize={500}
+          verticalTop={0}
+        />;
+    }
+
     /**
      * renderTable generates the whole table.
      */
@@ -675,11 +685,13 @@ export default class Table extends Component {
             { renderHeaders() }
             { renderRows() }
             { isLoading && shownLoader }
+            {verticalScrollbar}
           </div>
           { pagination && renderPagination() }
         </div>
       );
     };
+    console.log(verticalScrollbar)
 
     return renderTable();
   }

@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 import cn from 'classnames';
 import MouseTracker from './helpers/mouseTracker';
 import WheelHandler from './helpers/wheelHandler';
+import BrowserSupportCore from './helpers/browserSupportCore';
+import getVendorPrefixedName from './helpers/getVendorPrefixedName';
 
 const KEY = {
   SPACE: 32,
@@ -24,6 +26,34 @@ const FACE_MARGIN = 10;
 const FACE_MARGIN_2 = FACE_MARGIN * 2;
 const FACE_SIZE_MIN = 30;
 const KEYBOARD_SCROLL_AMOUNT = 40;
+const TRANSFORM = getVendorPrefixedName('transform');
+const BACKFACE_VISIBILITY = getVendorPrefixedName('backfaceVisibility');
+
+const translateDOMPositionXY = (function () {
+  if (BrowserSupportCore.hasCSSTransforms()) {
+    const ua = global.window ? global.window.navigator.userAgent : 'UNKNOWN';
+    const isSafari = (/Safari\//).test(ua) && !(/Chrome\//).test(ua);
+    // It appears that Safari messes up the composition order
+    // of GPU-accelerated layers
+    // (see bug https://bugs.webkit.org/show_bug.cgi?id=61824).
+    // Use 2D translation instead.
+    if (!isSafari && BrowserSupportCore.hasCSS3DTransforms()) {
+      return function (style, x, y) {
+        style[TRANSFORM] = `translate3d(${x}px, ${y}px, 0)`;
+        style[BACKFACE_VISIBILITY] = 'hidden';
+      };
+    } else {
+      return function (style, x, y) {
+        style[TRANSFORM] = `translate(${x}px, ${y}px)`;
+      };
+    }
+  } else {
+    return function (style, x, y) {
+      style.left = `${x}px`;
+      style.top = `${y}px`;
+    };
+  }
+}());
 
 export default class Scrollbar extends Component {
   constructor(props) {
@@ -31,6 +61,7 @@ export default class Scrollbar extends Component {
     this.onFocus = this.onFocus.bind(this);
     this.onBlur = this.onBlur.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
+    this.state = {};
   }
 
   componentWillMount() {
@@ -343,7 +374,7 @@ export default class Scrollbar extends Component {
       return null;
     }
     const { isHorizontal, isActive, faceSize } = this.state;
-    const { size, isOpaque } = this.props;
+    const { size, isOpaque, zIndex } = this.props;
     const isVertical = !isHorizontal;
     const verticalTop = this.props.verticalTop || 0;
     const position = this.state.position * this.state.scale + FACE_MARGIN;
@@ -352,20 +383,20 @@ export default class Scrollbar extends Component {
     let faceStyle;
 
     const mainClassName = cn({
-      'ScrollbarLayout/main': true,
-      'ScrollbarLayout/mainVertical': isVertical,
-      'ScrollbarLayout/mainHorizontal': isHorizontal,
-      'public/Scrollbar/main': true,
-      'public/Scrollbar/mainOpaque': isOpaque,
-      'public/Scrollbar/mainActive': isActive,
+      'ScrollbarLayout-main': true,
+      'ScrollbarLayout-mainVertical': isVertical,
+      'ScrollbarLayout-mainHorizontal': isHorizontal,
+      'public-Scrollbar-main': true,
+      'public-Scrollbar-mainOpaque': isOpaque,
+      'public-Scrollbar-mainActive': isActive,
     });
 
     const faceClassName = cn({
-      'ScrollbarLayout/face': true,
-      'ScrollbarLayout/faceHorizontal': isHorizontal,
-      'ScrollbarLayout/faceVertical': isVertical,
-      'public/Scrollbar/faceActive': isActive,
-      'public/Scrollbar/face': true,
+      'ScrollbarLayout-face': true,
+      'ScrollbarLayout-faceHorizontal': isHorizontal,
+      'ScrollbarLayout-faceVertical': isVertical,
+      'public-Scrollbar-faceActive': isActive,
+      'public-Scrollbar-face': true,
     });
 
     if (isHorizontal) {
@@ -387,7 +418,7 @@ export default class Scrollbar extends Component {
       translateDOMPositionXY(faceStyle, 0, position);
     }
 
-    mainStyle.zIndex = this.props.zIndex;
+    mainStyle.zIndex = zIndex;
 
     return (
       <div
