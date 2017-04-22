@@ -32,16 +32,25 @@ export default class WheelHandler {
 
   onWheel(event) {
     const normalizedEvent = normalizeWheel(event);
-    const deltaX = this.deltaX + normalizedEvent.pixelX;
-    const deltaY = this.deltaY + normalizedEvent.pixelY;
+    const deltaX = event.shiftKey ?
+      this.deltaX + normalizedEvent.pixelY
+      : this.deltaX + normalizedEvent.pixelX;
+    const deltaY = event.shiftKey ?
+      this.deltaY + normalizedEvent.pixelX
+      : this.deltaY + normalizedEvent.pixelY;
     const handleScrollX = this.handleScrollX(deltaX, deltaY);
     const handleScrollY = this.handleScrollY(deltaY, deltaX);
     if (!handleScrollX && !handleScrollY) {
       return;
     }
 
-    this.deltaX += handleScrollX ? normalizedEvent.pixelX : 0;
-    this.deltaY += handleScrollY ? normalizedEvent.pixelY : 0;
+    if (!event.shiftKey) {
+      this.deltaX += handleScrollX ? normalizedEvent.pixelX : 0;
+      this.deltaY += handleScrollY ? normalizedEvent.pixelY : 0;
+    } else {
+      this.deltaX += handleScrollX ? normalizedEvent.pixelY : 0;
+      this.deltaY += handleScrollY ? normalizedEvent.pixelX : 0;
+    }
     event.preventDefault();
 
     let changed;
