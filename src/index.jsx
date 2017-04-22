@@ -10,7 +10,6 @@ import HeaderCell from './headerCell';
 import WidthHelper from './helpers/sizeHelper';
 import ResizeSensor from './helpers/resizeSensor';
 import WheelHandler from './helpers/wheelHandler';
-import EventListener from './helpers/eventListener';
 import ScrollHelper from './helpers/scrollHelper';
 import translateDOMPositionXY from './helpers/translateDOMPositionXY';
 

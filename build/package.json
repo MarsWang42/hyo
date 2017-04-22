@@ -1,6 +1,6 @@
 {
   "name": "hyo",
-  "version": "0.1.10",
+  "version": "0.1.12",
   "description": "A light-weight datatable for React",
   "main": "index.js",
   "scripts": {
