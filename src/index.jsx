@@ -1,17 +1,17 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import cn from 'classnames';
-import Dropdown from './dropdown';
-import InlineEdit from './inlineEdit';
-import Spinner from './spinner';
-import Scrollbar from './scrollbar';
-import ColumnResizer from './resizeHandler';
-import HeaderCell from './headerCell';
+import Dropdown from './components/dropdown';
+import InlineEdit from './components/inlineEdit';
+import Spinner from './components/spinner';
+import Scrollbar from './components/scrollbar';
+import ColumnResizer from './components/resizeHandler';
+import HeaderCell from './components/headerCell';
 import WidthHelper from './helpers/sizeHelper';
 import ResizeSensor from './helpers/resizeSensor';
 import WheelHandler from './helpers/wheelHandler';
-import ScrollHelper from './helpers/scrollHelper';
-import translateDOMPositionXY from './helpers/translateDOMPositionXY';
+import ScrollHelper from './helpers/facebook/scrollHelper';
+import translateDOMPositionXY from './helpers/facebook/translateDOMPositionXY';
 
 
 // A solution for find mathod in IE
@@ -880,8 +880,8 @@ Table.propTypes = {
       key: PropTypes.string.isRequired,
       label: PropTypes.string.isRequired,
       sortable: PropTypes.bool,
-      onSort: PropTypes.function,
-      renderer: PropTypes.function,
+      onSort: PropTypes.func,
+      renderer: PropTypes.func,
     })).isRequired,
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
   filterable: PropTypes.bool,

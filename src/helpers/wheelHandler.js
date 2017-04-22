@@ -1,4 +1,4 @@
-import normalizeWheel from './normalizeWheel';
+import normalizeWheel from './facebook/normalizeWheel';
 
 let lastTime = 0;
 const requestAnimationFrame =

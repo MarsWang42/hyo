@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import cn from 'classnames';
-import EventListener from './helpers/eventListener';
+import EventListener from '../helpers/eventListener';
 
 export default class Dropdown extends Component {
   constructor(props) {

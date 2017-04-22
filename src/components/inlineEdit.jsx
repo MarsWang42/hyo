@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import Dropdown from './dropdown'
+import Dropdown from './dropdown';
 
 export default class InlineEdit extends Component {
   constructor(props) {
@@ -84,12 +84,23 @@ export default class InlineEdit extends Component {
 
 InlineEdit.propTypes = {
   value: PropTypes.string,
+  editType: PropTypes.string,
+  editOptions: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.shape({
+        label: PropTypes.string,
+        key: PropTypes.string,
+      }),
+    ])),
   onChange: PropTypes.func,
   renderer: PropTypes.func,
 };
 
 InlineEdit.defaultProps = {
   value: "",
+  editType: "input",
+  editOptions: [],
   onChange: undefined,
   renderer: undefined,
 };

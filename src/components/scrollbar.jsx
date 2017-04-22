@@ -1,9 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import cn from 'classnames';
-import MouseTracker from './helpers/mouseTracker';
-import WheelHandler from './helpers/wheelHandler';
-import translateDOMPositionXY from './helpers/translateDOMPositionXY';
+import MouseTracker from '../helpers/mouseTracker';
+import WheelHandler from '../helpers/wheelHandler';
+import translateDOMPositionXY from '../helpers/facebook/translateDOMPositionXY';
 
 const KEY = {
   SPACE: 32,
@@ -36,7 +36,7 @@ export default class Scrollbar extends Component {
       props.position || props.defaultPosition || 0,
       props.size,
       props.contentSize,
-      props.orientation
+      props.orientation,
     );
     this.shouldHandleX = this.shouldHandleX.bind(this);
     this.shouldHandleY = this.shouldHandleY.bind(this);
@@ -72,15 +72,6 @@ export default class Scrollbar extends Component {
     }
   }
 
-  componentWillUnmount() {
-    this.nextState = null;
-    this.mouseMoveTracker.releaseMouseMoves();
-    if (lastScrolledScrollbar === this) {
-      lastScrolledScrollbar = null;
-    }
-    delete this.mouseMoveTracker;
-  }
-
   componentWillReceiveProps(nextProps) {
     const controlledPosition = nextProps.position;
     if (controlledPosition === undefined) {
@@ -89,8 +80,8 @@ export default class Scrollbar extends Component {
           this.state.position,
           nextProps.size,
           nextProps.contentSize,
-          nextProps.orientation
-        )
+          nextProps.orientation,
+        ),
       );
     } else {
       this.setNextState(
@@ -98,11 +89,20 @@ export default class Scrollbar extends Component {
           controlledPosition,
           nextProps.size,
           nextProps.contentSize,
-          nextProps.orientation
+          nextProps.orientation,
         ),
         nextProps,
       );
     }
+  }
+
+  componentWillUnmount() {
+    this.nextState = null;
+    this.mouseMoveTracker.releaseMouseMoves();
+    if (lastScrolledScrollbar === this) {
+      lastScrolledScrollbar = null;
+    }
+    delete this.mouseMoveTracker;
   }
 
   // These methods are used to handle the wheel events.
@@ -156,7 +156,7 @@ export default class Scrollbar extends Component {
   onMouseDown(event) {
     let nextState;
 
-    if (event.target !== ReactDOM.findDOMNode(this.refs.face)) {
+    if (event.target !== ReactDOM.findDOMNode(this.face)) {
       // Both `offsetX` and `layerX` are non-standard DOM property but they are
       // magically available for browsers somehow.
       const nativeEvent = event.nativeEvent;
@@ -169,7 +169,7 @@ export default class Scrollbar extends Component {
       // scroll-face to the mouse position.
       position /= this.state.scale;
       nextState = this.calculateState(
-        position - (this.state.faceSize * 0.5 / this.state.scale),
+        position - ((this.state.faceSize * 0.5) / this.state.scale),
         size,
         contentSize,
         orientation,
@@ -394,7 +394,7 @@ export default class Scrollbar extends Component {
     const { size, isOpaque, zIndex } = this.props;
     const isVertical = !isHorizontal;
     const verticalTop = this.props.verticalTop || 0;
-    const position = this.state.position * scale + FACE_MARGIN;
+    const position = (this.state.position * scale) + FACE_MARGIN;
 
     let mainStyle;
     let faceStyle;
@@ -449,7 +449,7 @@ export default class Scrollbar extends Component {
         tabIndex={0}
       >
         <div
-          ref="face"
+          ref={(face) => { this.face = face; }}
           className={faceClassName}
           style={faceStyle}
         />
@@ -457,3 +457,23 @@ export default class Scrollbar extends Component {
     );
   }
 }
+
+Scrollbar.propTypes = {
+  position: PropTypes.number.isRequired,
+  size: PropTypes.number.isRequired,
+  contentSize: PropTypes.number.isRequired,
+  onScroll: PropTypes.func.isRequired,
+  verticalTop: PropTypes.number,
+  defaultPosition: PropTypes.number,
+  orientation: PropTypes.string,
+  zIndex: PropTypes.number,
+  isOpaque: PropTypes.bool,
+};
+
+Scrollbar.defaultProps = {
+  zIndex: 1,
+  isOpaque: false,
+  verticalTop: 0,
+  orientation: "vertical",
+  defaultPosition: 0,
+};
