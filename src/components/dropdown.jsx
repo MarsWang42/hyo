@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import cn from 'classnames';
-import EventListener from './helpers/eventListener';
+import EventListener from '../helpers/eventListener';
 
 export default class Dropdown extends Component {
   constructor(props) {
@@ -23,12 +23,12 @@ export default class Dropdown extends Component {
    */
   componentDidMount() {
     this.eventClickToken = EventListener.listen(
-      document,
+      document.body,
       'click',
       this.hideDropdown,
     );
     this.eventTouchendToken = EventListener.listen(
-      document,
+      document.body,
       'touchend',
       this.hideDropdown,
     );

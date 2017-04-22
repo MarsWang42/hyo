@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
-import MouseTracker from './helpers/mouseTracker';
-import Utils from './helpers/utils';
+import MouseTracker from '../helpers/mouseTracker';
+import Utils from '../helpers/utils';
 
 const clamp = (width, maxWidth, minWidth) => {
   if (width > maxWidth) width = maxWidth;

@@ -21,38 +21,14 @@ class EditableTable extends Component {
     this.state = {
       isLoading: false,
       data: [],
-      width: 0,
     };
-    this.update = this.update.bind(this);
-    this.onResize = this.onResize.bind(this);
   }
 
   componentDidMount() {
-    this.update();
-    const win = window;
-    if (win.addEventListener) {
-      win.addEventListener('resize', this.onResize, false);
-    } else if (win.attachEvent) {
-      win.attachEvent('onresize', this.onResize);
-    } else {
-      win.onresize = this.onResize;
-    }
     this.setState({ isLoading: true });
     setTimeout(() => {
       this.setState({ isLoading: false, data });
     }, 1000);
-  }
-
-  onResize() {
-    clearTimeout(this.updateTimer);
-    this.updateTimer = setTimeout(this.update, 16);
-  }
-
-  update() {
-    if (ReactDOM.findDOMNode(this.table)) {
-      const newWidth = (ReactDOM.findDOMNode(this.table).parentNode.clientWidth);
-      this.setState({ width: newWidth });
-    }
   }
 
   render() {

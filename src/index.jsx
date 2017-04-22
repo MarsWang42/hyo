@@ -1,14 +1,64 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import cn from 'classnames';
-import Dropdown from './dropdown';
-import InlineEdit from './inlineEdit';
-import Spinner from './spinner';
-import ColumnResizer from './resizeHandler';
-import HeaderCell from './headerCell';
+import Dropdown from './components/dropdown';
+import InlineEdit from './components/inlineEdit';
+import Spinner from './components/spinner';
+import Scrollbar from './components/scrollbar';
+import ColumnResizer from './components/resizeHandler';
+import HeaderCell from './components/headerCell';
 import WidthHelper from './helpers/sizeHelper';
 import ResizeSensor from './helpers/resizeSensor';
-import EventListener from './helpers/eventListener';
+import WheelHandler from './helpers/wheelHandler';
+import ScrollHelper from './helpers/facebook/scrollHelper';
+import translateDOMPositionXY from './helpers/facebook/translateDOMPositionXY';
+
+
+// A solution for find mathod in IE
+// https://tc39.github.io/ecma262/#sec-array.prototype.find
+if (!Array.prototype.find) {
+  Object.defineProperty(Array.prototype, 'find', {
+    value: function(predicate) {
+     // 1. Let O be ? ToObject(this value).
+      if (this == null) {
+        throw new TypeError('"this" is null or not defined');
+      }
+
+      var o = Object(this);
+
+      // 2. Let len be ? ToLength(? Get(O, "length")).
+      var len = o.length >>> 0;
+
+      // 3. If IsCallable(predicate) is false, throw a TypeError exception.
+      if (typeof predicate !== 'function') {
+        throw new TypeError('predicate must be a function');
+      }
+
+      // 4. If thisArg was supplied, let T be thisArg; else let T be undefined.
+      var thisArg = arguments[1];
+
+      // 5. Let k be 0.
+      var k = 0;
+
+      // 6. Repeat, while k < len
+      while (k < len) {
+        // a. Let Pk be ! ToString(k).
+        // b. Let kValue be ? Get(O, Pk).
+        // c. Let testResult be ToBoolean(? Call(predicate, T, « kValue, k, O »)).
+        // d. If testResult is true, return kValue.
+        var kValue = o[k];
+        if (predicate.call(thisArg, kValue, k, o)) {
+          return kValue;
+        }
+        // e. Increase k by 1.
+        k++;
+      }
+
+      // 7. Return undefined.
+      return undefined;
+    },
+  });
+}
 
 export default class Table extends Component {
   constructor(props) {
@@ -26,11 +76,20 @@ export default class Table extends Component {
     this.updateWidth = this.updateWidth.bind(this);
     this.initializeWidth = this.initializeWidth.bind(this);
     this.onResizeWidth = this.onResizeWidth.bind(this);
-    this.updateHeight = this.updateHeight.bind(this);
-    this.onResizeHeight = this.onResizeHeight.bind(this);
+    this.onWheel = this.onWheel.bind(this);
+    this.onVerticalScroll = this.onVerticalScroll.bind(this);
+    this.onHorizontalScroll = this.onHorizontalScroll.bind(this);
+    this.shouldHandleWheelX = this.shouldHandleWheelX.bind(this);
+    this.shouldHandleWheelY = this.shouldHandleWheelY.bind(this);
   }
 
   componentWillMount() {
+    this.wheelHandler = new WheelHandler(
+      this.onWheel,
+      this.shouldHandleWheelX,
+      this.shouldHandleWheelY,
+    );
+
     this.initializeStates(this.props);
   }
 
@@ -39,16 +98,6 @@ export default class Table extends Component {
       const parentNode = ReactDOM.findDOMNode(this.table).parentNode;
       this.initializeWidth(parentNode);
       this.resizeSensor = new ResizeSensor(parentNode, this.onResizeWidth);
-    }
-    if (this.props.height === "auto") {
-      const win = window;
-      this.updateHeight(win);
-
-      this.eventResizeWidthToken = EventListener.listen(
-        win,
-        'resize',
-        this.onResizeHeight,
-      );
     }
   }
 
@@ -81,17 +130,14 @@ export default class Table extends Component {
     this.updateTimer = setTimeout(this.updateWidth, 16);
   }
 
-  onResizeHeight() {
-    clearTimeout(this.updateTimer);
-    this.updateTimer = setTimeout(this.updateHeight, 16);
-  }
-
   initializeWidth() {
     const domNode = ReactDOM.findDOMNode(this.table).parentNode;
     if (domNode) {
       const newWidth = (domNode.clientWidth - 20);
       const cols = WidthHelper.adjustColWidths(this.props.def, newWidth);
-      this.setState({ width: newWidth, cols });
+      const maxScrollX = WidthHelper.getHeaderWidth(cols, newWidth)
+        - newWidth;
+      this.setState({ width: newWidth, maxScrollX, cols });
     }
   }
 
@@ -99,15 +145,89 @@ export default class Table extends Component {
     if (this.table) {
       const domNode = ReactDOM.findDOMNode(this.table).parentNode;
       const newWidth = (domNode.clientWidth - 20);
-      this.setState({ width: newWidth });
+      const maxScrollX = WidthHelper.getHeaderWidth(this.state.cols, newWidth)
+        - newWidth;
+      this.setState({ width: newWidth, maxScrollX });
     }
   }
 
-  updateHeight() {
-    const win = window;
-    if (win) {
-      const newHeight = (win.innerHeight- 50);
-      this.setState({ height: newHeight });
+  shouldHandleWheelX(delta) {
+    delta = Math.round(delta);
+    if (delta === 0) {
+      return false;
+    }
+
+    return (
+      (delta < 0 && this.state.scrollX > 0) ||
+      (delta >= 0 && this.state.scrollX < this.state.maxScrollX)
+    );
+  }
+
+  shouldHandleWheelY(delta) {
+    delta = Math.round(delta);
+    if (delta === 0) {
+      return false;
+    }
+
+    return (
+      (delta < 0 && this.state.scrollY > 0) ||
+      (delta >= 0 && this.state.scrollY < this.state.maxScrollY)
+    );
+  }
+
+  onWheel(deltaX, deltaY) {
+    if (!this.isScrolling) this.isScrolling = true;
+    let x = this.state.scrollX;
+    if (Math.abs(deltaY) > Math.abs(deltaX)) {
+      const scrollState = this.scrollHelper.scrollBy(Math.round(deltaY));
+      const maxScrollY = Math.max(
+        0,
+        scrollState.contentHeight - this.state.height + this.props.headerHeight,
+      );
+      this.setState({
+        firstRowIndex: scrollState.index,
+        firstRowOffset: scrollState.offset,
+        scrollY: scrollState.position,
+        scrollContentHeight: scrollState.contentHeight,
+        maxScrollY,
+      });
+    } else if (deltaX) {
+      x += deltaX;
+      x = x < 0 ? 0 : x;
+      x = x > this.state.maxScrollX ? this.state.maxScrollX : x;
+      this.setState({
+        scrollX: x,
+      });
+    }
+
+    this.isScrolling = false;
+  }
+
+  onVerticalScroll(scrollPos) {
+    if (scrollPos !== this.state.scrollY) {
+      if (!this.isScrolling) {
+        this.isScrolling = true;
+      }
+      const scrollState = this.scrollHelper.scrollTo(Math.round(scrollPos));
+      this.setState({
+        firstRowIndex: scrollState.index,
+        firstRowOffset: scrollState.offset,
+        scrollY: scrollState.position,
+        scrollContentHeight: scrollState.contentHeight,
+      });
+      this.isScrolling = false;
+    }
+  }
+
+  onHorizontalScroll(scrollPos) {
+    if (scrollPos !== this.state.scrollX) {
+      if (!this.isScrolling) {
+        this.isScrolling = true;
+      }
+      this.setState({
+        scrollX: scrollPos,
+      });
+      this.isScrolling = false;
     }
   }
 
@@ -120,9 +240,9 @@ export default class Table extends Component {
       pageSize,
       pagination,
       def,
-      height,
       rowHeight,
       headerHeight,
+      height,
     } = props;
     let { width } = props;
     if (width === "auto") width = 100000;
@@ -133,6 +253,20 @@ export default class Table extends Component {
     const rowNum = pagination ? pageSize : data.length;
     const newHeight = Math.min(height, (rowHeight * rowNum) + headerHeight);
 
+    this.scrollHelper = new ScrollHelper(
+      pageSize,
+      rowHeight,
+      newHeight - headerHeight,
+    );
+
+    const scrollState = this.scrollHelper.scrollTo(0);
+    const firstRowIndex = scrollState.index;
+    const firstRowOffset = scrollState.offset;
+    const scrollY = scrollState.position;
+    const scrollX = 0;
+    const maxScrollY = rowHeight * pageSize - newHeight + headerHeight;
+    const maxScrollX = WidthHelper.getHeaderWidth(cols, width) - width;
+
     this.setState({
       pageRows,
       resolvedRows: data,
@@ -140,6 +274,12 @@ export default class Table extends Component {
       cols,
       height: newHeight,
       width,
+      firstRowIndex,
+      firstRowOffset,
+      scrollY,
+      scrollX,
+      maxScrollY,
+      maxScrollX,
     });
   }
 
@@ -160,10 +300,10 @@ export default class Table extends Component {
       filterable,
       pagination,
       pageSize,
-      height,
       rowHeight,
       headerHeight,
     } = this.props;
+    let { height } = this.state;
     let newResolvedRows = data;
     let updatedRows;
 
@@ -260,6 +400,10 @@ export default class Table extends Component {
       columnResizingData,
       isColumnResizing,
       width,
+      scrollY,
+      scrollX,
+      maxScrollX,
+      maxScrollY,
     } = this.state;
 
     const {
@@ -272,6 +416,40 @@ export default class Table extends Component {
       rowHeight,
       headerHeight,
     } = this.props;
+
+    const contentWidth = WidthHelper.getHeaderWidth(cols, width);
+
+    let verticalScrollbar;
+    if (maxScrollY > 0) {
+      verticalScrollbar = (
+        <Scrollbar
+          size={height - headerHeight}
+          contentSize={rowHeight * pageSize}
+          verticalTop={headerHeight}
+          position={scrollY}
+          onScroll={this.onVerticalScroll}
+        />
+      );
+    }
+
+    let horizontalScrollbar;
+    if (maxScrollX > 0) {
+      const innerContainerStyle = {
+        width,
+      };
+      horizontalScrollbar = (
+        <div style={innerContainerStyle} className="horizontal-scrollbar-container">
+          <Scrollbar
+            size={width}
+            contentSize={contentWidth}
+            orientation="horizontal"
+            position={scrollX}
+            onScroll={this.onHorizontalScroll}
+            offset={undefined}
+          />
+        </div>
+      );
+    }
 
     const sortColumn = (col) => {
       if (col.sortable) {
@@ -348,10 +526,13 @@ export default class Table extends Component {
         if (col.key !== colKey) return col;
         else return newCol;
       });
+      const maxScrollX = WidthHelper.getHeaderWidth(newCols, this.state.width)
+        - this.state.width;
 
       this.setState({
         cols: newCols,
         columnResizingData: {},
+        maxScrollX,
         isColumnResizing: false,
       });
     };
@@ -505,9 +686,11 @@ export default class Table extends Component {
     const renderHeaders = () => {
       let currentPosition = 0;
       const theadStyle = {
-        width: WidthHelper.getHeaderWidth(cols, width),
+        width: contentWidth,
         height: headerHeight,
       };
+
+      translateDOMPositionXY(theadStyle, -scrollX, 0);
 
       const headers = cols.map((col, i) => {
         const thClassName = cn({
@@ -617,6 +800,9 @@ export default class Table extends Component {
      */
     const renderRows = () => {
       let currentRowPosition = 0;
+      let rowsStyle = { top: headerHeight };
+
+      translateDOMPositionXY(rowsStyle, -scrollX, -scrollY);
       const rows = pageRows.map((row, i) => {
         let currentCellPosition = 0;
         const cell = cols.map((col, j) => {
@@ -631,7 +817,7 @@ export default class Table extends Component {
         };
         const backgroundStyle = {
           height: rowHeight,
-          width: WidthHelper.getHeaderWidth(cols, width),
+          width: contentWidth,
         };
         const backgroundClassName = cn({
           "hyo-tr-background": true,
@@ -648,7 +834,7 @@ export default class Table extends Component {
         return currentRow;
       });
       return (
-        <div className="hyo-tbody" style={{ top: headerHeight }}>
+        <div className="hyo-tbody" style={rowsStyle}>
           {!isLoading && rows }
         </div>
       );
@@ -670,10 +856,14 @@ export default class Table extends Component {
       return (
         <div className="hyo" ref={(table) => { this.table = table; }}>
           { filterable && renderFilter() }
-          <div className={tableClass} style={style}>
-            { renderHeaders() }
-            { renderRows() }
-            { isLoading && shownLoader }
+        <div className="hyo-table-layout">
+            <div className={tableClass} style={style} onWheel={this.wheelHandler.onWheel}>
+              { renderHeaders() }
+              { renderRows() }
+              { isLoading && shownLoader }
+            </div>
+            {!isLoading && verticalScrollbar}
+            {!isLoading && horizontalScrollbar}
           </div>
           { pagination && renderPagination() }
         </div>
@@ -690,8 +880,8 @@ Table.propTypes = {
       key: PropTypes.string.isRequired,
       label: PropTypes.string.isRequired,
       sortable: PropTypes.bool,
-      onSort: PropTypes.function,
-      renderer: PropTypes.function,
+      onSort: PropTypes.func,
+      renderer: PropTypes.func,
     })).isRequired,
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
   filterable: PropTypes.bool,

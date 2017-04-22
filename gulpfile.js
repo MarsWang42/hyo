@@ -12,7 +12,7 @@ gulp.task('webpack', function () {
 });
 
 gulp.task('sass', function () {
-  gulp.src('src/*.scss')
+  gulp.src('src/styles/style.scss')
     .pipe(sass({ outputStyle: 'compressed' })
       .on('error', sass.logError))
     .pipe(autoprefixer())
